@@ -113,7 +113,8 @@ class AppService:
         """Format threat model output to markdown"""
         threat_model = model_output.get("threat_model", [])
         improvement_suggestions = model_output.get("improvement_suggestions", [])
-        return json_to_markdown(threat_model, improvement_suggestions)
+        open_questions = model_output.get("open_questions",[])
+        return json_to_markdown(threat_model, improvement_suggestions, open_questions)
 
     def format_dread_output(self, dread_assessment: Dict[str, Any]) -> str:
         """Format DREAD assessment output to markdown"""

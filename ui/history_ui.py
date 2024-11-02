@@ -46,7 +46,12 @@ class HistoryUI:
                 markdown += "\n## Improvement Suggestions\n\n"
                 for suggestion in threat_model_output['improvement_suggestions']:
                     markdown += f"- {suggestion}\n"
-                    
+
+            if 'open_questions' in threat_model_output:
+                markdown += "\n## Open Questions\n\n"
+                for suggestion in threat_model_output['open_questions']:
+                    markdown += f"- {suggestion}\n"
+
             return markdown
         except Exception as e:
             st.error(f"Error formatting threat model: {str(e)}")

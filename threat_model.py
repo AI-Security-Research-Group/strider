@@ -5,7 +5,7 @@ from openai import OpenAI
 import streamlit as st
 
 # Function to convert JSON to Markdown for display.    
-def json_to_markdown(threat_model, improvement_suggestions):
+def json_to_markdown(threat_model, improvement_suggestions, open_questions):
     markdown_output = "## Threat Model\n\n"
     
     # Start the markdown table with headers
@@ -19,6 +19,10 @@ def json_to_markdown(threat_model, improvement_suggestions):
     markdown_output += "\n\n## Improvement Suggestions\n\n"
     for suggestion in improvement_suggestions:
         markdown_output += f"- {suggestion}\n"
+        
+    markdown_output += "\n\n## Open Questions\n\n"
+    for question in open_questions:
+        markdown_output += f"- {question}\n"
     
     return markdown_output
 
@@ -29,9 +33,11 @@ Act as a cyber security expert with more than 20 years experience of using the S
 
 For each of the STRIDE categories (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege), list multiple (3 or 4) credible threats if applicable. Each threat scenario should provide a credible scenario in which the threat could occur in the context of the application. It is very important that your responses are tailored to reflect the details you are given.
 
-When providing the threat model, use a JSON formatted response with the keys "threat_model" and "improvement_suggestions". Under "threat_model", include an array of objects with the keys "Threat Type", "Scenario", and "Potential Impact". 
+When providing the threat model, use a JSON formatted response with the keys "threat_model", "improvement_suggestions", and "open_questions". Under "threat_model", include an array of objects with the keys "Threat Type", "Scenario", and "Potential Impact". 
 
 Under "improvement_suggestions", include an array of strings with suggestions on how the developers can improve their code or application description to enhance security.
+
+Under "open_questions", include an array of strings with critical questions that need to be answered to better understand the security context of the application.
 
 APPLICATION TYPE: {app_type}
 AUTHENTICATION METHODS: {authentication}
@@ -53,13 +59,17 @@ Example of expected JSON response format:
           "Threat Type": "Tampering",
           "Scenario": "Example Scenario ",
           "Potential Impact": "Example Potential Impact "
-        }},
-        // ... coninue with other threat categories and mention more threats 
+        }}
       ],
       "improvement_suggestions": [
         "Example improvement suggestion 1.",
-        "Example improvement suggestion 2.",
-        // ... more suggestions
+        "Example improvement suggestion 2."
+        ...provide more improvement suggestions...
+      ],
+      "open_questions": [
+        "What authentication mechanism is used for external users?",
+        "How is sensitive data encrypted at rest?"
+        ...ask more open questions if you have...
       ]
     }}
 """
