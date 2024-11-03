@@ -1,28 +1,24 @@
-Project Structure
-
 root/
- -attack_tree.py
- -dread.py
  -main.py
- -mitigations.py
  -requirements.txt
- -test_cases.py
- -threat_model.py
+ services/
+    -__init__.py
+    -app_service.py
+    -attack_tree.py
+    -dread.py
+    -mitigations.py
+    -test_cases.py
+    -threat_model.py
+    -transcript_analyzer.py
  utils/
- 	-__init__.py
-	-database.py
- 	-file_processing.py
- 	-image_processing.py
-	-transcript_processor.py
-ui/
-	-__init__.py
-	-app_ui.py
-	-history_ui.py
-	-transcript_ui.py
-services/
-	-__init__.py
-	-app_service.py
-	-transcript_analyzer.py
-threat_models.db
-
-command to run ```streamlit run main.py```
+    -__init__.py
+    -database.py
+    -file_processing.py
+    -image_processing.py
+    -transcript_processor.py
+ ui/
+    -__init__.py
+    -app_ui.py
+    -history_ui.py
+    -transcript_ui.py
+ threat_models.db

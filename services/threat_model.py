@@ -3,6 +3,7 @@ import requests
 from typing import Optional, Dict, Any
 from openai import OpenAI
 import streamlit as st
+import base64  # Add this for image processing
 
 # Function to convert JSON to Markdown for display.    
 def json_to_markdown(threat_model, improvement_suggestions, open_questions):

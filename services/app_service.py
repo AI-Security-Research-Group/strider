@@ -1,10 +1,10 @@
-import streamlit as st
 from typing import Dict, Any, Tuple
-from attack_tree import create_attack_tree_prompt, get_attack_tree, get_attack_tree_ollama
-from dread import create_dread_assessment_prompt, get_dread_assessment, get_dread_assessment_ollama, dread_json_to_markdown
-from mitigations import create_mitigations_prompt, get_mitigations, get_mitigations_ollama
-from test_cases import create_test_cases_prompt, get_test_cases, get_test_cases_ollama
-from threat_model import (
+import streamlit as st
+from services.attack_tree import create_attack_tree_prompt, get_attack_tree, get_attack_tree_ollama
+from services.dread import create_dread_assessment_prompt, get_dread_assessment, get_dread_assessment_ollama, dread_json_to_markdown
+from services.mitigations import create_mitigations_prompt, get_mitigations, get_mitigations_ollama
+from services.test_cases import create_test_cases_prompt, get_test_cases, get_test_cases_ollama
+from services.threat_model import (
     create_threat_model_prompt, get_threat_model, get_threat_model_ollama,
     json_to_markdown, create_image_analysis_prompt, get_image_analysis
 )
