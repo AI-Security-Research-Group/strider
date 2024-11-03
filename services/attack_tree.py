@@ -13,7 +13,7 @@ SENSITIVE DATA: {sensitive_data}
 APPLICATION DESCRIPTION: {app_input}
 """
     return prompt
-
+    print(prompt)
 
 # Function to get attack tree from the GPT response.
 def get_attack_tree(api_key, model_name, prompt):
@@ -39,6 +39,8 @@ graph TD
     D --> F["Save Image and Code"]
     F --> B
 ```
+
+Double check and make sure the mermaid syntax is correct and in sctrictly follows above given format only.
 
 IMPORTANT: Round brackets are special characters in Mermaid syntax. If you want to use round brackets inside a node label you MUST wrap the label in double quotes. For example, ["Example Node Label (ENL)"].
 """},
@@ -71,8 +73,6 @@ Act as a cyber security expert with more than 20 years experience of using the S
 
 You MUST only respond with the Mermaid code block. See below for a simple example of the required format and syntax for your output.
 
-Make sure the mermaid syntax is correct.
-
 ```mermaid
 graph TD
     A[Enter Chart Definition] --> B(Preview)
@@ -84,7 +84,20 @@ graph TD
     F --> B
 ```
 
-IMPORTANT: Round brackets are special characters in Mermaid syntax. If you want to use round brackets inside a node label you MUST wrap the label in double quotes. For example, ["Example Node Label (ENL)"].
+
+
+Double check and make sure the mermaid syntax is correct and in sctrictly follows above given format only.
+
+IMPORTANT: Round brackets are special characters in Mermaid syntax. If you want to use round brackets inside a node label you MUST wrap the label in double quotes.
+
+Never include parentheses ( ) and braces { } inside square brackets [ ] like in 
+
+example: B --> C[some text (CSJS)]
+example: C --> E[{Unsuccessful Auth}]
+
+
+ Correct synatx would be For example, ["Example Node Label (ENL)"].
+
 """},
             {
                 "role": "user",

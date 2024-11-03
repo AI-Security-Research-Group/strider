@@ -68,8 +68,8 @@ Example of expected JSON response format:
         ...provide more improvement suggestions...
       ],
       "open_questions": [
-        "What authentication mechanism is used for external users?",
-        "How is sensitive data encrypted at rest?"
+        "Example question 1.",
+        "Example question 2."
         ...ask more open questions if you have...
       ]
     }}

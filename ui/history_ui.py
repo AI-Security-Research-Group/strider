@@ -12,21 +12,43 @@ class HistoryUI:
     def render_mermaid(self, code: str, height: int = 500) -> None:
         """Render Mermaid diagram"""
         try:
-            components.html(
-                f"""
-                <pre class="mermaid" style="height: {height}px;">
-                    {code}
-                </pre>
+            # Clean and normalize the Mermaid code
+            code = code.strip()
+            if not code:
+                st.warning("No diagram code available.")
+                return
+
+            # HTML with Mermaid initialization
+            html = f"""
+                <div class="mermaid-container">
+                    <pre class="mermaid" style="height: {height}px;">
+                        {code}
+                    </pre>
+                </div>
 
                 <script type="module">
                     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
                     mermaid.initialize({{ startOnLoad: true, theme: 'neutral' }});
                 </script>
-                """,
-                height=height,
-            )
+
+                <style>
+                    .mermaid-container {{
+                        width: 100%;
+                        overflow: auto;
+                        background-color: white;
+                        padding: 10px;
+                        border-radius: 5px;
+                        border: 1px solid #e0e0e0;
+                    }}
+                </style>
+            """
+            
+            # Render the HTML
+            components.html(html, height=height + 50)
+            
         except Exception as e:
             st.error(f"Error rendering attack tree: {str(e)}")
+            st.code(code, language="mermaid")  # Fallback to display the code
 
     def format_threat_model_content(self, threat_model_output):
         """Convert threat model JSON to readable format"""
@@ -34,7 +56,6 @@ class HistoryUI:
             if isinstance(threat_model_output, str):
                 threat_model_output = json.loads(threat_model_output)
                 
-            # Create formatted markdown
             markdown = "## Identified Threats\n\n"
             markdown += "| Threat Type | Scenario | Potential Impact |\n"
             markdown += "|------------|----------|------------------|\n"
@@ -49,8 +70,8 @@ class HistoryUI:
 
             if 'open_questions' in threat_model_output:
                 markdown += "\n## Open Questions\n\n"
-                for suggestion in threat_model_output['open_questions']:
-                    markdown += f"- {suggestion}\n"
+                for question in threat_model_output['open_questions']:
+                    markdown += f"- {question}\n"
 
             return markdown
         except Exception as e:
@@ -103,6 +124,31 @@ class HistoryUI:
         except Exception as e:
             st.error(f"Error deleting record: {str(e)}")
 
+    def render_attack_tree(self, model) -> None:
+        """Dedicated method to render attack tree with proper error handling"""
+        try:
+            if model.attack_tree:
+                attack_tree_code = model.attack_tree.strip()
+                if attack_tree_code:
+                    col1, col2 = st.columns([9,1])
+                    with col1:
+                        st.write("**Attack Tree Diagram:**")
+                        self.render_mermaid(attack_tree_code)
+                    with col2:
+                        st.download_button(
+                            "📥",
+                            attack_tree_code,
+                            file_name=f"attack_tree_{model.id}.md",
+                            mime="text/plain",
+                            help="Download Attack Tree"
+                        )
+                else:
+                    st.warning("Attack tree data is empty.")
+            else:
+                st.info("No attack tree available for this threat model.")
+        except Exception as e:
+            st.error(f"Error displaying attack tree: {str(e)}")
+
     def render_history(self):
         """Render the history tab content"""
         st.write("# Threat Model History")
@@ -150,12 +196,12 @@ class HistoryUI:
                 # Application Description
                 st.write("**Application Description:**")
                 st.text_area(
-                    label="Application Description",  # Added proper label
+                    label="Application Description",
                     value=model.app_input,
                     height=100,
                     key=f"desc_{model.id}",
                     disabled=True,
-                    label_visibility="collapsed"  # This hides the label but keeps it accessible
+                    label_visibility="collapsed"
                 )
                 
                 if artifacts_present:
@@ -181,22 +227,7 @@ class HistoryUI:
 
                             # Attack Tree Tab
                             elif tab_name == "Attack Tree" and model.attack_tree:
-                                col1, col2 = st.columns([9,1])
-                                with col1:
-                                    st.write("**Attack Tree Diagram:**")
-                                    if model.attack_tree.strip():  # Check if attack tree is not empty
-                                        self.render_mermaid(model.attack_tree)
-                                    else:
-                                        st.warning("Attack tree data is empty.")
-                                with col2:
-                                    st.download_button(
-                                        "📥",
-                                        model.attack_tree,
-                                        file_name=f"attack_tree_{model.id}.md",
-                                        mime="text/plain",
-                                        help="Download Attack Tree"
-                                    )
-
+                                self.render_attack_tree(model)
 
                             # Mitigations Tab
                             elif tab_name == "Mitigations" and model.mitigations:
@@ -211,7 +242,6 @@ class HistoryUI:
                                         mime="text/markdown",
                                         help="Download Mitigations"
                                     )
-
 
                             # DREAD Assessment Tab
                             elif tab_name == "DREAD Assessment" and model.dread_assessment:
@@ -228,7 +258,6 @@ class HistoryUI:
                                         help="Download DREAD Assessment"
                                     )
 
-
                             # Test Cases Tab
                             elif tab_name == "Test Cases" and model.test_cases:
                                 col1, col2 = st.columns([9,1])
@@ -242,7 +271,6 @@ class HistoryUI:
                                         mime="text/markdown",
                                         help="Download Test Cases"
                                     )
-
 
                 # Delete button for the entire record
                 col1, col2, col3 = st.columns([6, 2, 2])
