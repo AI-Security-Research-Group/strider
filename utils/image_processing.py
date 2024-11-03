@@ -43,10 +43,27 @@ def analyze_image_ollama(image_data: bytes, prompt: str, model: str = "llava:lat
     directly determined from the diagram itself.
         """
         
+        # Check if model is available in Ollama
+        try:
+            response = requests.get("http://localhost:11434/api/tags")
+            available_models = [m["name"] for m in response.json().get("models", [])]
+            
+            if "llava:latest" not in available_models:
+                st.warning("Llava model not found. Installing llava:latest...")
+                install_response = requests.post(
+                    "http://localhost:11434/api/pull",
+                    json={"name": "llava:latest"}
+                )
+                if install_response.status_code != 200:
+                    raise Exception("Failed to install llava:latest model")
+                st.success("Successfully installed llava:latest model")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Error checking/installing Llava model: {str(e)}")
+        
         # Prepare the API request
         url = "http://localhost:11434/api/chat"
         payload = {
-            "model": model,
+            "model": "llava:latest",  # Always use llava:latest
             "messages": [
                 {
                     "role": "system",
