@@ -22,6 +22,7 @@ class ThreatModel(Base):
     mitigations = Column(Text, nullable=True)
     dread_assessment = Column(JSON, nullable=True)
     test_cases = Column(Text, nullable=True)
+    qa_context = Column(JSON, nullable=True)  
 
 class DatabaseManager:
     def __init__(self, db_path="threat_models.db"):
@@ -31,21 +32,23 @@ class DatabaseManager:
         self.session = Session()
     
     def save_threat_model(self, 
-                         app_type: str,
-                         authentication: list,
-                         internet_facing: str,
-                         sensitive_data: str,
-                         app_input: str,
-                         threat_model_output: dict) -> int:
+                        app_type: str,
+                        authentication: list,
+                        internet_facing: str,
+                        sensitive_data: str,
+                        app_input: str,
+                        threat_model_output: dict,
+                        qa_context: dict = None) -> int:
         """Save a new threat model to database"""
         try:
             threat_model = ThreatModel(
                 app_type=app_type,
-                authentication=','.join(authentication),
+                authentication=','.join(authentication) if isinstance(authentication, list) else authentication,
                 internet_facing=internet_facing,
                 sensitive_data=sensitive_data,
                 app_input=app_input,
-                threat_model_output=threat_model_output
+                threat_model_output=threat_model_output,
+                qa_context=qa_context
             )
             self.session.add(threat_model)
             self.session.commit()
