@@ -57,7 +57,7 @@ class AppUI:
                 model_name = st.sidebar.selectbox(
                     "Select the model you would like to use:",
                     available_models,
-                    index=available_models.index("llama2") if "llama2" in available_models else 0,
+                    index=available_models.index("llama3.1:latest") if "llama3.1:latest" in available_models else 0,
                     key="selected_model",
                 )
             except requests.exceptions.RequestException:
