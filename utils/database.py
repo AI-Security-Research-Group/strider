@@ -23,6 +23,7 @@ class ThreatModel(Base):
     dread_assessment = Column(JSON, nullable=True)
     test_cases = Column(Text, nullable=True)
     qa_context = Column(JSON, nullable=True)  
+    data_flow_diagram = Column(Text, nullable=True) 
 
 class DatabaseManager:
     def __init__(self, db_path="threat_models.db"):

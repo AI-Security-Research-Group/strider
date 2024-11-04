@@ -189,7 +189,9 @@ class HistoryUI:
                         artifacts_present.append("DREAD Assessment")
                     if model.test_cases:
                         artifacts_present.append("Test Cases")
-                        
+                    if model.data_flow_diagram:  # Add this check
+                        artifacts_present.append("Data Flow Diagram")       
+
                     for artifact in artifacts_present:
                         st.write(f"- ✅ {artifact}")
                 
@@ -270,6 +272,19 @@ class HistoryUI:
                                         file_name=f"test_cases_{model.id}.md",
                                         mime="text/markdown",
                                         help="Download Test Cases"
+                                    )
+                            elif tab_name == "Data Flow Diagram" and model.data_flow_diagram:
+                                col1, col2 = st.columns([9,1])
+                                with col1:
+                                    st.write("**Data Flow Diagram:**")
+                                    self.render_mermaid(model.data_flow_diagram)
+                                with col2:
+                                    st.download_button(
+                                        "📥",
+                                        model.data_flow_diagram,
+                                        file_name=f"data_flow_diagram_{model.id}.md",
+                                        mime="text/plain",
+                                        help="Download Data Flow Diagram"
                                     )
 
                 # Delete button for the entire record

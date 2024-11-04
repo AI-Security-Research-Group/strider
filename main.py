@@ -5,6 +5,7 @@ from utils.database import DatabaseManager
 from ui.history_ui import HistoryUI
 from ui.transcript_ui import TranscriptUI 
 from ui.qa_context_ui import QAContextUI
+from ui.dfd_ui import DataFlowDiagramUI
 
 def main():
     # Initialize UI, Service, and Database components
@@ -22,9 +23,9 @@ def main():
     }
     
     # Create tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "Threat Model", "Q&A Context", "Mitigations", 
-        "DREAD", "Test Cases", "Attack Tree", "Transcript Analysis", "All Threat Models"
+        "DREAD", "Test Cases", "Attack Tree", "Transcript Analysis", "All Threat Models", "Data Flow Diagram"
     ])
     
     # Handle Threat Model tab
@@ -216,6 +217,10 @@ def main():
     # Handle History tab
     with tab8:
         history_ui.render_history()
+    
+    with tab9:
+        dfd_ui = DataFlowDiagramUI()
+        dfd_ui.render()
 
 if __name__ == "__main__":
     main()
