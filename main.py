@@ -215,7 +215,7 @@ def main():
         qa_context_ui.render(inputs, model_config)
 
     #shows dataflow diagram
-     with tab8:
+    with tab8:
         dfd_ui = DataFlowDiagramUI()
         dfd_ui.render()
 
