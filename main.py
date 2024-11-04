@@ -25,7 +25,7 @@ def main():
     # Create tabs
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "Threat Model", "Q&A Context", "Mitigations", 
-        "DREAD", "Test Cases", "Attack Tree", "Transcript Analysis", "All Threat Models", "Data Flow Diagram"
+        "DREAD", "Test Cases", "Attack Tree", "Transcript Analysis", "Data Flow Diagram", "All Threat Models"
     ])
     
     # Handle Threat Model tab
@@ -213,14 +213,16 @@ def main():
     with tab2:
         qa_context_ui = QAContextUI()
         qa_context_ui.render(inputs, model_config)
-    
-    # Handle History tab
-    with tab8:
-        history_ui.render_history()
-    
-    with tab9:
+
+    #shows dataflow diagram
+     with tab8:
         dfd_ui = DataFlowDiagramUI()
         dfd_ui.render()
+
+    # Handle History tab
+    with tab9:
+        history_ui.render_history()
+
 
 if __name__ == "__main__":
     main()
