@@ -189,9 +189,9 @@ class HistoryUI:
                         artifacts_present.append("DREAD Assessment")
                     if model.test_cases:
                         artifacts_present.append("Test Cases")
-                    if model.data_flow_diagram:  # Add this check
-                        artifacts_present.append("Data Flow Diagram")       
-
+                    if model.data_flow_diagram:  # Add check for DFD
+                        artifacts_present.append("Data Flow Diagram")
+                        
                     for artifact in artifacts_present:
                         st.write(f"- ✅ {artifact}")
                 
@@ -273,7 +273,7 @@ class HistoryUI:
                                         mime="text/markdown",
                                         help="Download Test Cases"
                                     )
-                            elif tab_name == "Data Flow Diagram" and model.data_flow_diagram:
+                            if tab_name == "Data Flow Diagram" and model.data_flow_diagram:
                                 col1, col2 = st.columns([9,1])
                                 with col1:
                                     st.write("**Data Flow Diagram:**")
@@ -286,11 +286,11 @@ class HistoryUI:
                                         mime="text/plain",
                                         help="Download Data Flow Diagram"
                                     )
-
+                
                 # Delete button for the entire record
                 col1, col2, col3 = st.columns([6, 2, 2])
                 with col3:
                     if st.button("🗑️ Delete Record", key=f"delete_{model.id}", type="primary"):
                         self.handle_delete(model.id)
 
-                st.markdown("---")  # Separator between records
+                st.markdown("---")  # Separator between record
