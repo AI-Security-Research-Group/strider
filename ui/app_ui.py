@@ -361,7 +361,7 @@ class AppUI:
             
         # Add document content if exists
         if st.session_state.get('doc_content'):
-            combined.append("\nDocument Content:")
+            combined.append("Application Description:")
             combined.append(st.session_state['doc_content'])
             
         return "\n\n".join(filter(None, combined))
