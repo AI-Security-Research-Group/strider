@@ -95,7 +95,7 @@ class AppUI:
             page_title="STRIDER",
             page_icon=":shield:",
             layout="wide",
-            initial_sidebar_state="expanded",
+            initial_sidebar_state="expanded"
         )
 
     def load_env_variables(self):
@@ -108,7 +108,26 @@ class AppUI:
 
     def render_sidebar(self) -> Tuple[str, str, str]:
         """Render sidebar and return model configuration"""
+        st.markdown(
+    """
+    <h1 font-family: Arial, sans-serif; font-weight: bold;'>
+        STRIDER
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
+
+        # Additional description below the logo
+        st.write(
+            """
+            **🤖 Automated Self-Serve Threat Modeling Assistant for Engineering Teams**
+            
+            """
+            
+            )
+
         st.sidebar.header("How to use STRIDER")
+        
         
         model_provider = st.sidebar.selectbox(
             "Select your preferred model provider:",
@@ -361,7 +380,6 @@ class AppUI:
             
         # Add document content if exists
         if st.session_state.get('doc_content'):
-            combined.append("Application Description:")
             combined.append(st.session_state['doc_content'])
             
         return "\n\n".join(filter(None, combined))
@@ -555,7 +573,7 @@ class AppUI:
             </pre>
 
             <script type="module">
-                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
                 mermaid.initialize({{ startOnLoad: true }});
             </script>
             """,

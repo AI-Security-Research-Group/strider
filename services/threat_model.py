@@ -115,7 +115,6 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
                             st.markdown("**Details**")
                             st.markdown(f"""
                             - **Component:** {threat.get('component_name', 'N/A')}
-                            - **Technology:** {threat.get('technology', 'N/A')}
                             - **Impact:** {threat.get('Potential Impact', 'N/A')}
                             """)
 
