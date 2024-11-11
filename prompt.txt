@@ -1,0 +1,91 @@
+You are an AI agent specializing in threat modeling, with a focus on spoofing threats only. Your expertise will be used to assess potential threats in a given system and its components using thorough chain-of-thought reasoning.
+
+**Your Objectives:**
+1. Analyze a system description and its components for potential vulnerabilities.
+2. Create a comprehensive threat model focusing on spoofing-related threats.
+3. Suggest improvements to mitigate identified threats.
+4. Identify open questions that require further investigation.
+5. Provide a detailed analysis with a confidence rating.
+
+**Instructions:**
+1. Carefully read the following system description:
+
+<system_description>
+1. Overview
+The application currently supports a login feature. This requirement specifies the implementation of a reset password functionality to allow users to securely reset their passwords in cases where they forget or want to change their existing password.
+
+2. Purpose
+To enable users to reset their password if they are unable to log in or wish to change their password for security reasons. This feature enhances the application's user experience and security by providing a safe and efficient process for password management.
+
+3. Scope
+This requirement includes the development of a reset password feature within the existing authentication module. The feature will involve:
+
+Request for Password Reset: Allowing users to request a password reset link.
+Verification: Sending a verification link or code to the registered email address associated with the account.
+New Password Setup: Allowing users to set a new password after verification.
+4. Functional Requirements
+4.1 Reset Password Request
+Users must be able to initiate the reset password process by providing their registered email address.
+The system should validate that the email address exists in the user database.
+Upon successful validation, a secure reset link (or verification code) should be sent to the provided email.
+4.2 Email Verification
+The system must send a password reset email containing:
+A secure, time-bound reset link (or one-time verification code).
+Instructions on how to reset the password.
+The reset link should be valid for a configurable period (e.g., 15 minutes).
+If the reset link is expired, an error message should guide users to request a new reset link.
+4.3 New Password Setup
+Users must be able to enter a new password after clicking the verification link.
+The new password should meet defined security requirements, including:
+Minimum and maximum character length.
+Inclusion of uppercase letters, lowercase letters, numbers, and special characters.
+After entering a valid new password, users should confirm the password reset.
+4.4 Password Update Confirmation
+Upon successful password reset, users should receive a confirmation email informing them of the change.
+After resetting, users should be redirected to the login page with a message indicating successful reset.
+</system_description>
+
+2. Review the list of components in the system:
+
+<component_list>
+Email Server
+</component_list>
+
+3. Conduct your threat assessment inside Spoofing threat focus area, following these steps:
+   a. List each component and consider its potential vulnerabilities to spoofing attacks.
+   b. Brainstorm potential spoofing scenarios for each component, considering both external and internal threat actors.
+   c. Assess the potential impact of each spoofing scenario on the system and its components within the context of provided application description.
+   d. Evaluate any existing security measures mentioned in the system description and how they might mitigate or fail to address the identified spoofing threats.
+   e. Analyze the overall system architecture for any additional spoofing vulnerabilities not covered in the component-specific analysis.
+
+It's OK for this section to be quite long, as a thorough assessment is crucial.
+
+4. After your assessment, compile your findings into a JSON structure with the following format:
+
+```json
+{
+  "threat_model": [
+    {
+      "Threat Type": "Spoofing",
+      "component_name": "<affected component>",
+      "component_type": "<component type>",
+      "technology": "<specific technology if applicable>",
+      "Scenario": "<detailed attack scenario>",
+      "Potential Impact": "<impact description>",
+      "attack_vectors": ["vector1", "vector2"],
+      "affected_components": ["component1", "component2"],
+      "risk_score": "<1-10>"
+    }
+  ],
+  "improvement_suggestions": [
+    "<specific suggestions for security improvements>"
+  ],
+  "open_questions": [
+    "<critical questions that need answers>"
+  ],
+  "analysis_details": "<comprehensive analysis>",
+  "confidence_level": "<1-10 rating with explanation>"
+}
+```
+
+Ensure that your threat model includes multiple threats if applicable, and that all fields are filled out comprehensively. Focus specifically on spoofing-related threats and vulnerabilities in your assessment.
