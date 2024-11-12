@@ -50,40 +50,98 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
                             "DosExpert", "ElevationExpert", "InformationDisclosureExpert"]:
                 stride_results[agent_name] = result
 
+    # Add debug logging
+    logger.info("Processing threat model for display")
+    logger.info(f"Total STRIDE results: {len(stride_results)}")
 
     if not stride_results:
         return "No threat analysis available."
 
     st.markdown("# 🛡️ Security Analysis Dashboard")
 
+    # Collect all threats from STRIDE results and identify KB threats
+    all_threats = []
+    kb_threats = []
+    for agent_name, result in stride_results.items():
+        agent_threats = result.get('threats', [])
+        logger.info(f"Agent {agent_name} has {len(agent_threats)} threats")
+        
+        for threat in agent_threats:
+            if threat.get('source') == 'Knowledge Base':
+                kb_threats.append(threat)
+            all_threats.append(threat)
+
+    # Log threat counts
+    logger.info(f"Total threats: {len(all_threats)}")
+    logger.info(f"KB threats: {len(kb_threats)}")
+
     # Overall metrics at the top
-    total_threats = sum(len(result.get('threats', [])) for result in stride_results.values())
+    total_threats = len(all_threats)
     total_high_risks = sum(
-        sum(1 for threat in result.get('threats', []) 
-            if float(threat.get('risk_score', 0)) >= 7)
-        for result in stride_results.values()
+        1 for threat in all_threats 
+        if float(threat.get('risk_score', 0)) >= 7
     )
 
-    # Create metric columns
+    # Create metric columns with KB info
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Total Threats", total_threats)
     with col2:
         st.metric("High Risk Threats", total_high_risks)
     with col3:
-        st.metric("Components Affected", 
-                 len(set(threat.get('component_name', '') 
-                     for result in stride_results.values() 
-                     for threat in result.get('threats', []))))
+        st.metric("KB Threats", len(kb_threats))
     with col4:
         st.metric("STRIDE Categories", len(stride_results))
 
-    # Main content in tabs
+    # Display KB threats if present
+    if kb_threats:
+        st.markdown("## 📚 Knowledge Base Verified Threats")
+        for threat in kb_threats:
+            with st.expander(f"🔒 {threat.get('name', 'KB Threat')} - {threat.get('Threat Type', 'Unknown')}"):
+                col1, col2 = st.columns([2,1])
+                
+                with col1:
+                    st.markdown(f"""
+                    **Description:**  
+                    {threat.get('Scenario', 'No description provided')}
+                    
+                    **Component:** {threat.get('component_name', 'N/A')}  
+                    **Category:** {threat.get('Threat Type', 'N/A')}
+                    """)
+                    
+                    if threat.get('attack_vectors'):
+                        st.markdown("**Attack Vectors:**")
+                        for vector in threat['attack_vectors']:
+                            st.markdown(f"🔶 {vector}")
+
+                with col2:
+                    severity = threat.get('severity', 'medium').lower()
+                    severity_colors = {
+                        'high': '#dc3545',
+                        'medium': '#ffc107',
+                        'low': '#28a745'
+                    }
+                    st.markdown(f"""
+                    <div style='background-color: {severity_colors.get(severity, '#6c757d')}; 
+                         color: white; padding: 15px; border-radius: 10px; text-align: center;'>
+                        <h3 style='margin: 0;'>{severity.upper()}</h3>
+                        <p style='margin: 0;'>Severity Level</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                if threat.get('mitigations'):
+                    st.markdown("**Recommended Mitigations:**")
+                    for mitigation in threat['mitigations']:
+                        st.markdown(f"✓ {mitigation}")
+
+        st.markdown("---")
+
+    # Main content in tabs (existing STRIDE analysis)
     tabs = st.tabs([name.replace('Expert', '').upper() for name in stride_results.keys()])
     
     for tab, (agent_name, result) in zip(tabs, stride_results.items()):
         with tab:
-            # Header with confidence level
+            # Rest of your existing tab content...
             st.markdown(f"""
             <div style='display: flex; justify-content: space-between; align-items: center;'>
                 <h2>{agent_name.replace('Expert', '')} Analysis</h2>
@@ -96,11 +154,16 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
             # Threats section
             if result.get('threats'):
                 for threat in result['threats']:
+                    # Skip KB threats as they're already displayed
+                    if threat.get('source') == 'Knowledge Base':
+                        continue
+                        
                     risk_score = float(threat.get('risk_score', 0))
                     risk_color = ("🔴" if risk_score >= 7 else 
                                 "🟡" if risk_score >= 4 else "🟢")
                     
                     with st.container():
+                        # Your existing threat display code...
                         st.markdown(f"""
                         <div style='border-left: 4px solid {"red" if risk_score >= 7 else "orange" if risk_score >= 4 else "green"}; 
                                     padding: 10px; margin: 10px 0; background-color: #f8f9fa;'>
@@ -109,7 +172,7 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
                         </div>
                         """, unsafe_allow_html=True)
 
-                        # Details in columns
+                        # Rest of your existing threat display code...
                         col1, col2 = st.columns([2, 1])
                         with col1:
                             st.markdown("**Details**")
@@ -118,20 +181,17 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
                             - **Impact:** {threat.get('Potential Impact', 'N/A')}
                             """)
 
-                            # Attack vectors with visual indicators
                             if threat.get('attack_vectors'):
                                 st.markdown("**Attack Vectors:**")
                                 for vector in threat['attack_vectors']:
                                     st.markdown(f"🔶 {vector}")
 
-                            # Affected components with visual indicators
                             if threat.get('affected_components'):
                                 st.markdown("**Affected Components:**")
                                 for comp in threat['affected_components']:
                                     st.markdown(f"⚡ {comp}")
 
                         with col2:
-                            # Risk score card
                             st.markdown(f"""
                             <div style='background-color: {"#dc3545" if risk_score >= 7 else "#ffc107" if risk_score >= 4 else "#28a745"}; 
                                       color: white; padding: 20px; border-radius: 10px; text-align: center;'>
@@ -140,7 +200,7 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
                             </div>
                             """, unsafe_allow_html=True)
 
-            # Recommendations and Questions in expandable sections
+            # Rest of your existing code for recommendations and questions...
             col1, col2 = st.columns(2)
             with col1:
                 with st.expander("💡 Improvement Suggestions", expanded=True):
@@ -152,12 +212,12 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
                     for q in result.get('open_questions', []):
                         st.markdown(f"- {q}")
 
-            # Detailed analysis in collapsible section
             if result.get('analysis_details'):
                 with st.expander("📋 Full Analysis Details"):
                     st.markdown(result['analysis_details'])
 
     return ""  # Return empty string as we're using direct st.markdown
+
 
 def format_agent_analysis(agent_analyses: List[tuple]) -> str:
     """Format the agent analysis results into Markdown format"""

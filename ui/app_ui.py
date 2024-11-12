@@ -244,11 +244,13 @@ class AppUI:
             # Text area with combined content
             input_text = st.text_area(
                 label="Describe the application to be modelled",
-                value=st.session_state['app_input'],
+                value=st.session_state.get('app_input', ''),
                 placeholder="Enter your application details...",
                 height=300,
-                key="app_desc"
+                key="app_desc",
             )
+            st.session_state['app_input'] = input_text
+
             # Update session state when text changes manually
             if input_text != st.session_state['app_input']:
                 st.session_state['app_input'] = input_text
@@ -299,6 +301,26 @@ class AppUI:
                 )
                 if custom_component:
                     components = [c if c != "Custom" else custom_component for c in components]
+
+            if "detected_components" in st.session_state:
+                st.markdown("### 🔍 Detected Components")
+                for comp in st.session_state["detected_components"]:
+                    confidence_color = "#00ff00" if comp["confidence"] >= 0.6 else "#ffff00"
+                    st.markdown(
+                        f"""
+                        <div style='padding: 10px; border-left: 4px solid {confidence_color}; margin: 5px 0;'>
+                            <strong>{comp['name']}</strong> (Confidence: {comp['confidence']*100:.0f}%)
+                            <br/>Matches: {', '.join(comp['matches'])}
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                if "suggested_components" in st.session_state:
+                    st.markdown("### 💡 Suggested Additional Components")
+                    for suggestion in st.session_state["suggested_components"]:
+                        st.markdown(f"- {suggestion['type']}: {suggestion['reason']}")
+            
 
             # Technology Stack Selection
             tech_stack = st.multiselect(

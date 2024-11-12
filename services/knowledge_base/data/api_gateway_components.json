@@ -1,0 +1,80 @@
+{
+    "components": {
+        "API Gateway": {
+            "type": "api_gateway",
+            "common_threats": [
+                {
+                    "id": "API-001",
+                    "name": "Authentication Bypass",
+                    "category": "Spoofing",
+                    "description": "Attackers bypass API authentication mechanisms to gain unauthorized access",
+                    "attack_vectors": [
+                        "Token forgery",
+                        "JWT signature bypass",
+                        "OAuth token theft"
+                    ],
+                    "prerequisites": [
+                        "Weak authentication mechanisms",
+                        "Misconfigured security policies"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 9,
+                        "integrity": 8,
+                        "availability": 5
+                    },
+                    "mitigations": [
+                        "Implement strong authentication mechanisms",
+                        "Use secure token validation",
+                        "Regular security audits",
+                        "Implement rate limiting",
+                        "Enable request logging and monitoring"
+                    ],
+                    "affected_components": [
+                        "api_gateway",
+                        "auth_service"
+                    ]
+                },
+                {
+                    "id": "API-002",
+                    "name": "DDoS Attack",
+                    "category": "Denial of Service",
+                    "description": "Overwhelming API gateway with massive number of requests",
+                    "attack_vectors": [
+                        "HTTP flood",
+                        "Slow HTTP attacks",
+                        "Resource exhaustion"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 2,
+                        "integrity": 3,
+                        "availability": 9
+                    },
+                    "mitigations": [
+                        "Implement rate limiting",
+                        "Use DDoS protection services",
+                        "Enable request throttling",
+                        "Configure automatic scaling"
+                    ],
+                    "affected_components": [
+                        "api_gateway",
+                        "backend_services"
+                    ]
+                }
+            ],
+            "security_considerations": [
+                "Rate limiting configuration",
+                "Authentication mechanisms",
+                "Traffic monitoring",
+                "Access control policies"
+            ],
+            "best_practices": [
+                "Use HTTPS only",
+                "Implement API versioning",
+                "Regular security updates",
+                "Comprehensive logging"
+            ]
+        }
+    }
+}

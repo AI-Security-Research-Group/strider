@@ -1,0 +1,76 @@
+{
+    "components": {
+        "Authentication Service": {
+            "type": "authentication_service",
+            "common_threats": [
+                {
+                    "id": "AUTH-001",
+                    "name": "Credential Stuffing",
+                    "category": "Spoofing",
+                    "description": "Automated attempts to access accounts using stolen credentials",
+                    "attack_vectors": [
+                        "Automated login attempts",
+                        "Password spraying",
+                        "Credential database usage"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 8,
+                        "integrity": 7,
+                        "availability": 5
+                    },
+                    "mitigations": [
+                        "Implement MFA",
+                        "Rate limiting on login attempts",
+                        "CAPTCHA on login forms",
+                        "Account lockout policies",
+                        "Monitor for suspicious login patterns"
+                    ],
+                    "affected_components": [
+                        "auth_service",
+                        "user_database"
+                    ]
+                },
+                {
+                    "id": "AUTH-002",
+                    "name": "Session Hijacking",
+                    "category": "Spoofing",
+                    "description": "Unauthorized capture and use of valid session tokens",
+                    "attack_vectors": [
+                        "Session token theft",
+                        "Man-in-the-middle attacks",
+                        "XSS cookie theft"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 9,
+                        "integrity": 8,
+                        "availability": 4
+                    },
+                    "mitigations": [
+                        "Use secure session management",
+                        "Implement secure cookie attributes",
+                        "Regular session rotation",
+                        "TLS for all communications"
+                    ],
+                    "affected_components": [
+                        "auth_service",
+                        "web_frontend"
+                    ]
+                }
+            ],
+            "security_considerations": [
+                "Password policy enforcement",
+                "MFA implementation",
+                "Session management",
+                "Access token security"
+            ],
+            "best_practices": [
+                "Secure password storage",
+                "Regular security audits",
+                "Comprehensive logging",
+                "Incident response planning"
+            ]
+        }
+    }
+}

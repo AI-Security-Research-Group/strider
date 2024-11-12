@@ -1,0 +1,87 @@
+{
+    "components": {
+        "Database": {
+            "type": "database",
+            "common_threats": [
+                {
+                    "id": "DB-001",
+                    "name": "SQL Injection",
+                    "category": "Tampering",
+                    "description": "Malicious SQL queries injected through unvalidated user input can manipulate or expose database contents",
+                    "attack_vectors": [
+                        "Unvalidated user input in SQL queries",
+                        "Dynamic SQL string concatenation",
+                        "Stored procedures with dynamic SQL"
+                    ],
+                    "prerequisites": [
+                        "Access to input fields",
+                        "Lack of input validation",
+                        "Lack of prepared statements"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 9,
+                        "integrity": 9,
+                        "availability": 7
+                    },
+                    "mitigations": [
+                        "Use parameterized queries or prepared statements",
+                        "Implement input validation and sanitization",
+                        "Use stored procedures with static SQL",
+                        "Apply principle of least privilege for database users",
+                        "Regular security audits and penetration testing"
+                    ],
+                    "affected_components": [
+                        "database",
+                        "api_service",
+                        "backend"
+                    ],
+                    "detection_methods": [
+                        "Database activity monitoring",
+                        "SQL query logging",
+                        "Web application firewall alerts"
+                    ]
+                },
+                {
+                    "id": "DB-002",
+                    "name": "Sensitive Data Exposure",
+                    "category": "Information Disclosure",
+                    "description": "Unencrypted sensitive data in database can be exposed through various attack vectors",
+                    "attack_vectors": [
+                        "Database backup theft",
+                        "Unencrypted data at rest",
+                        "Insecure data transmission"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 9,
+                        "integrity": 5,
+                        "availability": 3
+                    },
+                    "mitigations": [
+                        "Encrypt sensitive data at rest",
+                        "Use TLS for data in transit",
+                        "Implement secure backup procedures",
+                        "Regular access control reviews"
+                    ],
+                    "affected_components": [
+                        "database",
+                        "backup_systems"
+                    ]
+                }
+            ],
+            "security_considerations": [
+                "Implement encryption at rest",
+                "Regular security patches",
+                "Access control monitoring",
+                "Backup encryption"
+            ],
+            "best_practices": [
+                "Use prepared statements",
+                "Implement row-level security",
+                "Regular security audits",
+                "Backup validation procedures"
+            ]
+        }
+    }
+}

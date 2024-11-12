@@ -15,14 +15,23 @@ class KBDataLoader:
             os.path.dirname(__file__),
             'data'
         )
+        logger.info(f"Initialized KBDataLoader with data directory: {self.data_dir}")
 
     def load_all_data(self):
         """Load all KB data files"""
         try:
+            # Check if data directory exists
+            if not os.path.exists(self.data_dir):
+                logger.warning(f"Data directory not found: {self.data_dir}")
+                return
+
             # Load each JSON file in the data directory
-            for filename in os.listdir(self.data_dir):
-                if filename.endswith('.json'):
-                    self.load_file(filename)
+            files = [f for f in os.listdir(self.data_dir) if f.endswith('.json')]
+            logger.info(f"Found {len(files)} JSON files to load")
+
+            for filename in files:
+                self.load_file(filename)
+                
             logger.info("Successfully loaded all KB data")
         except Exception as e:
             logger.error(f"Error loading KB data: {str(e)}")
@@ -31,20 +40,33 @@ class KBDataLoader:
         """Load a specific KB data file"""
         try:
             file_path = os.path.join(self.data_dir, filename)
+            logger.info(f"Loading file: {file_path}")
+
             with open(file_path, 'r') as f:
                 data = json.load(f)
                 
-            # Add each component to the database
-            for comp_type, comp_data in data.get('components', {}).items():
-                self.db.add_component(comp_type, comp_data)
-                
-            logger.info(f"Successfully loaded {filename}")
+            # Load each component
+            components = data.get('components', {})
+            logger.info(f"Found {len(components)} components in {filename}")
+
+            for comp_name, comp_data in components.items():
+                logger.info(f"Adding component: {comp_name}")
+                success = self.db.add_component(comp_name, comp_data)
+                if not success:
+                    logger.error(f"Failed to add component: {comp_name}")
+
         except Exception as e:
             logger.error(f"Error loading {filename}: {str(e)}")
 
-# Usage example
-def initialize_kb():
-    db = KnowledgeBaseDB()
-    loader = KBDataLoader(db)
-    loader.load_all_data()
-    return db
+# Initialize function
+def initialize_kb() -> KnowledgeBaseDB:
+    """Initialize the knowledge base and load data"""
+    try:
+        logger.info("Initializing knowledge base")
+        db = KnowledgeBaseDB()
+        loader = KBDataLoader(db)
+        loader.load_all_data()
+        return db
+    except Exception as e:
+        logger.error(f"Error initializing knowledge base: {str(e)}")
+        return KnowledgeBaseDB()  # Return empty DB as fallback

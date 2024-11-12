@@ -17,6 +17,7 @@ from services.threat_model import (
 from services.technology_analyzer import TechnologyStackAnalyzer, IntegrationAnalyzer, analyze_architecture
 from utils.file_processing import process_uploaded_file
 from utils.image_processing import analyze_image_ollama
+from services.component_detection import ComponentDetector
 from utils.database import DatabaseManager
 import logging
 
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 class AppService:
     def __init__(self):
         self.tech_analyzer = TechnologyStackAnalyzer()
+        self.component_detector = ComponentDetector()
         self.integration_analyzer = IntegrationAnalyzer()
         self.kb_service = KnowledgeBaseService()
         self.db_manager = DatabaseManager() 
@@ -65,20 +67,47 @@ class AppService:
             st.error(f"Error analyzing image: {str(e)}")
             return None
 
+
     def generate_threat_model(self, inputs: Dict[str, Any], model_config: Dict[str, str]) -> Dict[str, Any]:
-        """Generate threat model based on inputs with enhanced component context"""
+        """
+        Generate threat model based on inputs with enhanced component detection and KB integration
+        """
         try:
             logger.info("Starting enhanced threat model generation")
             
-            # Create enhanced context with component and tech stack
+            # 1. Component Detection
+            logger.info("Phase 1: Component Detection")
+            detected_components = self.component_detector.detect_components(inputs["app_input"])
+            
+            # Log detected components
+            logger.info("Detected components:")
+            for comp in detected_components:
+                logger.info(f"- {comp['name']} (Confidence: {comp['confidence']})")
+            
+            # Get suggestions for additional components
+            suggested_components = self.component_detector.suggest_additional_components(
+                detected_components,
+                inputs["app_input"]
+            )
+            
+            # Combine user-selected and detected components
+            all_components = set(inputs.get("components", []))
+            for comp in detected_components:
+                if comp["confidence"] >= 0.6:  # Only add high-confidence detections
+                    all_components.add(comp["name"])
+            
+            # 2. Create Enhanced Context
+            logger.info("Phase 2: Creating Enhanced Context")
             enhanced_context = {
-                "components": inputs.get("components", []),
+                "components": list(all_components),
                 "tech_stack": inputs.get("tech_stack", []),
                 "app_type": inputs["app_type"],
                 "authentication": inputs["authentication"],
                 "internet_facing": inputs["internet_facing"],
                 "sensitive_data": inputs["sensitive_data"],
-                "use_agents": inputs.get("use_agents", False)
+                "use_agents": inputs.get("use_agents", False),
+                "detected_components": detected_components,
+                "suggested_components": suggested_components
             }
             
             # Log analysis context
@@ -91,115 +120,139 @@ class AppService:
             logger.info(f"Data Sensitivity: {enhanced_context['sensitive_data']}")
             logger.info(f"Using Agents: {enhanced_context['use_agents']}")
 
-            try:
-                # Generate base prompt
-                prompt = create_threat_model_prompt(
-                    inputs["app_type"],
-                    inputs["authentication"],
-                    inputs["internet_facing"],
-                    inputs["sensitive_data"],
-                    inputs["app_input"]
+            # 3. Generate Enhanced Prompt
+            logger.info("Phase 3: Generating Enhanced Prompt")
+            prompt = create_threat_model_prompt(
+                inputs["app_type"],
+                inputs["authentication"],
+                inputs["internet_facing"],
+                inputs["sensitive_data"],
+                inputs["app_input"]
+            )
+
+            # Add component and tech stack context to prompt
+            component_context = "\nComponents in scope:\n"
+            for component in enhanced_context['components']:
+                component_context += f"- {component}\n"
+            
+            tech_context = "\nTechnology Stack:\n"
+            for tech in enhanced_context['tech_stack']:
+                tech_context += f"- {tech}\n"
+
+            enhanced_prompt = f"{prompt}\n{component_context}{tech_context}"
+            
+            # Log enhanced prompt
+            logger.info("\n=== Enhanced Prompt ===")
+            logger.info(enhanced_prompt)
+
+            # 4. Get Knowledge Base Threats
+            logger.info("Phase 4: Retrieving KB Threats")
+            kb_threats = []
+            for component in enhanced_context['components']:
+                # Get threats from knowledge base
+                component_threats = self.kb_service.get_component_threats(
+                    component_type=component,
+                    context={
+                        "name": component,
+                        "detected": any(dc["name"] == component for dc in detected_components),
+                        "tech_stack": enhanced_context['tech_stack'],
+                        "app_type": enhanced_context['app_type'],
+                        "sensitivity": enhanced_context['sensitive_data']
+                    }
                 )
+                if component_threats:
+                    logger.info(f"Found {len(component_threats)} KB threats for {component}")
+                    kb_threats.extend(component_threats)
 
-                # Add component and tech stack context to prompt
-                component_context = "\nComponents in scope:\n"
-                for component in enhanced_context['components']:
-                    component_context += f"- {component}\n"
-                
-                tech_context = "\nTechnology Stack:\n"
-                for tech in enhanced_context['tech_stack']:
-                    tech_context += f"- {tech}\n"
-
-                enhanced_prompt = f"{prompt}\n{component_context}{tech_context}"
-                
-                # Log enhanced prompt
-                logger.info("\n=== Enhanced Prompt ===")
-                logger.info(enhanced_prompt)
-
-                # Generate threat model based on provider
-                if model_config["provider"] == "OpenAI API":
-                    if not model_config["api_key"]:
-                        logger.error("No OpenAI API key provided")
-                        st.error("Please provide an OpenAI API key to proceed.")
-                        return {}
-                        
-                    logger.info("\n=== Using OpenAI API ===")
-                    use_agents = inputs.get("use_agents", False)
-                    logger.info(f"Agent-based analysis: {use_agents}")
+            # 5. Generate LLM-based Threats
+            logger.info("Phase 5: Generating LLM-based Threats")
+            result = None
+            
+            if model_config["provider"] == "OpenAI API":
+                if not model_config["api_key"]:
+                    logger.error("No OpenAI API key provided")
+                    st.error("Please provide an OpenAI API key to proceed.")
+                    return {}
                     
-                    result = get_threat_model(
-                        model_config["api_key"], 
+                logger.info("\n=== Using OpenAI API ===")
+                use_agents = enhanced_context['use_agents']
+                logger.info(f"Agent-based analysis: {use_agents}")
+                
+                result = get_threat_model(
+                    model_config["api_key"], 
+                    model_config["model_name"], 
+                    enhanced_prompt,
+                    use_agents
+                )
+                
+            elif model_config["provider"] == "Ollama":
+                try:
+                    logger.info("\n=== Using Ollama ===")
+                    result = get_threat_model_ollama(
                         model_config["model_name"], 
                         enhanced_prompt,
-                        use_agents
+                        enhanced_context['use_agents']
                     )
-                    
-                elif model_config["provider"] == "Ollama":
-                    try:
-                        logger.info("\n=== Using Ollama ===")
-                        result = get_threat_model_ollama(
-                            model_config["model_name"], 
-                            enhanced_prompt,
-                            inputs.get("use_agents", False)
-                        )
-                    except Exception as e:
-                        logger.error(f"Error connecting to Ollama: {str(e)}")
-                        st.info("Please ensure Ollama is running locally.")
-                        return {}
-                else:
-                    logger.error(f"Unsupported model provider: {model_config['provider']}")
-                    st.error("Unsupported model provider")
+                except Exception as e:
+                    logger.error(f"Error connecting to Ollama: {str(e)}")
+                    st.info("Please ensure Ollama is running locally.")
                     return {}
+            else:
+                logger.error(f"Unsupported model provider: {model_config['provider']}")
+                st.error("Unsupported model provider")
+                return {}
 
-                # Process results
-                if result:
-                    # Log result statistics
-                    logger.info("\n=== Analysis Results ===")
-                    logger.info(f"Threats found: {len(result.get('threat_model', []))}")
-                    logger.info(f"Improvements: {len(result.get('improvement_suggestions', []))}")
-                    logger.info(f"Questions: {len(result.get('open_questions', []))}")
+            # 6. Process and Combine Results
+            logger.info("Phase 6: Processing Results")
+            if result:
+                # Add KB threats to result
+                if kb_threats:
+                    logger.info(f"Adding {len(kb_threats)} KB-based threats")
+                    # Initialize threat_model list if not present
+                    if 'threat_model' not in result:
+                        result['threat_model'] = []
+                    
+                    # Process and add each KB threat
+                    for threat in kb_threats:
+                        kb_threat = {
+                            "Threat Type": threat.get("category", "Unknown"),
+                            "component_name": threat.get("component_name", "Unknown"),
+                            "Scenario": threat.get("description", ""),
+                            "Potential Impact": threat.get("impact", ""),
+                            "attack_vectors": threat.get("attack_vectors", []),
+                            "affected_components": threat.get("affected_components", []),
+                            "severity": threat.get("severity", "medium"),
+                            "source": "Knowledge Base",
+                            "risk_score": 8.0,  # KB threats are considered high confidence
+                            "name": threat.get("name", ""),
+                            "mitigations": threat.get("mitigations", [])
+                        }
+                        result['threat_model'].append(kb_threat)
 
-                    # Add component and tech stack context to results
-                    result['analysis_context'] = {
-                        'components': enhanced_context['components'],
-                        'tech_stack': enhanced_context['tech_stack']
-                    }
+                # Add analysis context
+                result['analysis_context'] = enhanced_context
 
-                    # Add KB-based threats for each component
-                    kb_threats = []
-                    for component in enhanced_context['components']:
-                        # Get threats from knowledge base
-                        component_threats = self.kb_service.get_component_threats(
-                            component_type=component,
-                            context={"name": component}
-                        )
-                        if component_threats:
-                            logger.info(f"Found {len(component_threats)} KB threats for {component}")
-                            kb_threats.extend(component_threats)
+                # Log result statistics
+                logger.info("\n=== Analysis Results ===")
+                logger.info(f"Total Threats: {len(result.get('threat_model', []))}")
+                logger.info(f"KB Threats: {len(kb_threats)}")
+                logger.info(f"LLM Threats: {len(result.get('threat_model', [])) - len(kb_threats)}")
+                logger.info(f"Improvements: {len(result.get('improvement_suggestions', []))}")
+                logger.info(f"Questions: {len(result.get('open_questions', []))}")
 
-                    # Add KB threats to result
-                    if kb_threats:
-                        logger.info(f"Adding {len(kb_threats)} KB-based threats")
-                        result['threat_model'].extend(kb_threats)
+                # Update session state with component info
+                st.session_state['detected_components'] = detected_components
+                st.session_state['suggested_components'] = suggested_components
 
-                    return result
-                else:
-                    logger.error("No result received from threat model generation")
-                    return {
-                        "threat_model": [],
-                        "improvement_suggestions": [],
-                        "open_questions": []
-                    }
-
-            except Exception as e:
-                logger.error(f"Error in threat model generation: {str(e)}")
-                logger.exception("Full traceback:")
+                return result
+            else:
+                logger.error("No result received from threat model generation")
                 return {
                     "threat_model": [],
                     "improvement_suggestions": [],
                     "open_questions": []
                 }
-                
+
         except Exception as e:
             logger.error(f"Error in generate_threat_model: {str(e)}")
             logger.exception("Full traceback:")
@@ -208,7 +261,7 @@ class AppService:
                 "improvement_suggestions": [],
                 "open_questions": []
             }
-
+                
     def generate_attack_tree(self, inputs: Dict[str, Any], model_config: Dict[str, str]) -> str:
         """Generate attack tree based on inputs"""
         logger.info("Generating attack tree")

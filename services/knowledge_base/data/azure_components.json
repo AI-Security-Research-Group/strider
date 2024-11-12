@@ -29,18 +29,7 @@
               "Regular key rotation",
               "Access auditing and monitoring"
             ],
-            "cves": [
-              {
-                "cve_id": "CVE-2021-XXXXX",
-                "description": "Example storage account vulnerability",
-                "severity": "high",
-                "affected_versions": ["All"],
-                "mitigation": "Use Managed Identities and Key Vault",
-                "references": [
-                  "https://azure.microsoft.com/security-best-practices"
-                ]
-              }
-            ],
+            "cves": [],
             "affected_components": [
               "web_app",
               "api_service"
@@ -64,112 +53,6 @@
           "Configure firewall and virtual network rules",
           "Enable logging for storage analytics"
         ]
-      },
-      "application_insights": {
-        "type": "monitoring",
-        "common_threats": [
-          {
-            "id": "AI-001",
-            "name": "Sensitive Data Exposure in Logs",
-            "category": "Information Disclosure",
-            "description": "Sensitive data being logged in Application Insights telemetry",
-            "attack_vectors": [
-              "Log inspection",
-              "Telemetry data extraction",
-              "Instrumentation key compromise"
-            ],
-            "severity": "medium",
-            "impact": {
-              "confidentiality": 7,
-              "integrity": 3,
-              "availability": 2
-            },
-            "mitigations": [
-              "Implement telemetry sanitization",
-              "Configure data sampling",
-              "Use role-based access control",
-              "Implement proper data retention policies"
-            ],
-            "affected_components": [
-              "web_app",
-              "api_service",
-              "database"
-            ],
-            "detection_methods": [
-              "Review logged data patterns",
-              "Monitor access to telemetry data",
-              "Regular log content audits"
-            ]
-          }
-        ],
-        "security_considerations": [
-          "Control access to telemetry data",
-          "Sanitize logged information",
-          "Protect instrumentation keys"
-        ]
-      },
-      "azure_cognitive_service": {
-        "type": "ai_service",
-        "common_threats": [
-          {
-            "id": "ACS-001",
-            "name": "API Key Exposure",
-            "category": "Information Disclosure",
-            "description": "Cognitive service API keys exposed in client-side code or repositories",
-            "attack_vectors": [
-              "Client-side key exposure",
-              "Repository scanning",
-              "Network traffic inspection"
-            ],
-            "severity": "high",
-            "impact": {
-              "confidentiality": 8,
-              "integrity": 6,
-              "availability": 5
-            },
-            "mitigations": [
-              "Use Azure Key Vault for key storage",
-              "Implement server-side proxy for cognitive services",
-              "Regular key rotation",
-              "Network access restrictions"
-            ],
-            "affected_components": [
-              "web_app",
-              "api_service"
-            ]
-          },
-          {
-            "id": "ACS-002",
-            "name": "Data Input Manipulation",
-            "category": "Tampering",
-            "description": "Malicious input provided to cognitive services to generate incorrect results",
-            "attack_vectors": [
-              "Input data poisoning",
-              "Request manipulation"
-            ],
-            "severity": "medium",
-            "impact": {
-              "confidentiality": 4,
-              "integrity": 7,
-              "availability": 3
-            },
-            "mitigations": [
-              "Implement input validation",
-              "Monitor service usage patterns",
-              "Set up anomaly detection"
-            ],
-            "affected_components": [
-              "ml_pipeline",
-              "data_processing"
-            ]
-          }
-        ],
-        "security_considerations": [
-          "Protect API keys and endpoints",
-          "Validate and sanitize inputs",
-          "Monitor usage patterns",
-          "Implement rate limiting"
-        ]
       }
     }
-  }
+}

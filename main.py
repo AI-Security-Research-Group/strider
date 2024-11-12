@@ -16,6 +16,9 @@ def main():
     service = AppService()
     db_manager = DatabaseManager()
     history_ui = HistoryUI(db_manager)
+
+    from services.knowledge_base.data_loader import initialize_kb
+    kb = initialize_kb()  # This will load the KB data    
     
     # Get model configuration from sidebar
     model_provider, api_key, model_name = ui.render_sidebar()

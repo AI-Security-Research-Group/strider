@@ -1,8 +1,8 @@
 # services/knowledge_base/models.py
 
+from enum import Enum
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
-from enum import Enum
 
 class ComponentType(str, Enum):
     API_GATEWAY = "api_gateway"

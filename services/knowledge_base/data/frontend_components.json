@@ -1,0 +1,49 @@
+{
+    "components": {
+        "Frontend": {
+            "type": "frontend",
+            "common_threats": [
+                {
+                    "id": "FE-001",
+                    "name": "Cross-Site Scripting (XSS)",
+                    "category": "Tampering",
+                    "description": "Injection of malicious scripts into web pages viewed by other users",
+                    "attack_vectors": [
+                        "Reflected XSS through URL parameters",
+                        "Stored XSS in user content",
+                        "DOM-based XSS"
+                    ],
+                    "severity": "high",
+                    "impact": {
+                        "confidentiality": 8,
+                        "integrity": 7,
+                        "availability": 5
+                    },
+                    "mitigations": [
+                        "Input validation and sanitization",
+                        "Content Security Policy (CSP)",
+                        "Output encoding",
+                        "Use modern frontend frameworks",
+                        "Regular security testing"
+                    ],
+                    "affected_components": [
+                        "frontend",
+                        "user_sessions"
+                    ]
+                }
+            ],
+            "security_considerations": [
+                "CSP implementation",
+                "CORS configuration",
+                "Input validation",
+                "Asset integrity"
+            ],
+            "best_practices": [
+                "Use secure dependencies",
+                "Regular security updates",
+                "Client-side validation",
+                "Secure state management"
+            ]
+        }
+    }
+}
