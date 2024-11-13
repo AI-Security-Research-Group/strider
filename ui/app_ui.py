@@ -4,6 +4,7 @@ import requests
 from typing import Dict, List, Any, Tuple
 from services.app_service import AppService
 from services.technology_analyzer import TechnologyStackAnalyzer, IntegrationAnalyzer
+from services.input_processor.processor import InputContextProcessor
 import os
 from dotenv import load_dotenv
 import logging
@@ -17,6 +18,8 @@ class AppUI:
         self.integration_analyzer = IntegrationAnalyzer()
         self.setup_page_config()
         self.load_env_variables()
+        self.input_processor = InputContextProcessor()
+        logger.info("AppUI initialized with Input Context Processor")        
 
     def render_technology_analysis(self, analysis: Dict[str, Any]) -> None:
         """Render technology stack analysis results"""
@@ -197,7 +200,9 @@ class AppUI:
         return model_provider, api_key, model_name
 
     def render_input_section(self) -> Dict[str, Any]:
-        """Render input section with proper state management"""
+        """Render complete input section with pre-processing capabilities"""
+        
+        # Create two columns for layout
         col1, col2 = st.columns([1, 1])
         
         with col1:
@@ -208,92 +213,133 @@ class AppUI:
                 st.session_state['doc_content'] = ''
             if 'image_analysis' not in st.session_state:
                 st.session_state['image_analysis'] = ''
+            if 'enhanced_context' not in st.session_state:
+                st.session_state['enhanced_context'] = ''
+            if 'analysis_results' not in st.session_state:
+                st.session_state['analysis_results'] = None
 
-            # File upload section
-            uploaded_doc = st.file_uploader(
-                "Upload a PDF or TXT file",
-                type=['pdf', 'txt'],
-                key="doc_uploader",
-                help="Upload a PDF or TXT file containing your application details."
-            )
-            
-            if uploaded_doc and uploaded_doc != st.session_state.get('last_uploaded_doc', ''):
-                with st.spinner('Processing uploaded file...'):
-                    file_content, success = self.service.process_file(uploaded_doc)
-                    if success:
-                        st.session_state['last_uploaded_doc'] = uploaded_doc
-                        st.session_state['doc_content'] = file_content
-                        # Combine document content with existing image analysis
-                        combined_content = self._combine_content()
-                        st.session_state['app_input'] = combined_content
-                        st.success(f"Successfully processed {uploaded_doc.name}")
-                    else:
-                        st.error("Failed to process the uploaded file.")
-
-            # Image upload section
-            uploaded_image = st.file_uploader(
-                "Upload architecture diagram (optional)",
-                type=["jpg", "jpeg", "png"],
-                key="image_uploader",
-                help="Upload an architecture diagram for analysis."
-            )
-
-            if uploaded_image:
-                self.handle_image_upload(uploaded_image)
+            # File Upload Section
+            st.markdown("### 📁 Upload Files")
+            with st.expander("Upload Documentation", expanded=True):
+                # Document upload
+                uploaded_doc = st.file_uploader(
+                    "Upload application documentation",
+                    type=['pdf', 'txt'],
+                    key="doc_uploader",
+                    help="Upload PDF or TXT files containing application details"
+                )
                 
-            # Text area with combined content
+                if uploaded_doc and uploaded_doc != st.session_state.get('last_uploaded_doc', ''):
+                    with st.spinner('Processing documentation...'):
+                        file_content, success = self.service.process_file(uploaded_doc)
+                        if success:
+                            st.session_state['last_uploaded_doc'] = uploaded_doc
+                            st.session_state['doc_content'] = file_content
+                            combined_content = self._combine_content()
+                            st.session_state['app_input'] = combined_content
+                            st.success(f"✅ Successfully processed {uploaded_doc.name}")
+                        else:
+                            st.error("❌ Failed to process the uploaded file")
+
+                # Architecture diagram upload
+                uploaded_image = st.file_uploader(
+                    "Upload architecture diagram",
+                    type=["jpg", "jpeg", "png"],
+                    key="image_uploader",
+                    help="Upload an architecture diagram for automated analysis"
+                )
+
+                if uploaded_image:
+                    with st.spinner('Analyzing architecture diagram...'):
+                        self.handle_image_upload(uploaded_image)
+
+            # Application Description
+            st.markdown("### 📝 Application Description")
             input_text = st.text_area(
-                label="Describe the application to be modelled",
+                label="Describe your application",
                 value=st.session_state.get('app_input', ''),
-                placeholder="Enter your application details...",
+                placeholder="Enter application details, architecture, and security requirements...",
                 height=300,
                 key="app_desc",
+                help="Provide comprehensive details about your application"
             )
             st.session_state['app_input'] = input_text
 
-            # Update session state when text changes manually
-            if input_text != st.session_state['app_input']:
-                st.session_state['app_input'] = input_text
-                    
+            # Pre-processing Button
+            if st.button("🔄 Run Context Pre-processing", type="primary", help="Analyze and enhance context"):
+                if st.session_state['app_input']:
+                    with st.spinner("🔍 Analyzing application context..."):
+                        try:
+                            # Get model configuration
+                            model_config = {
+                                "provider": st.session_state.get('model_provider', 'Ollama'),
+                                "api_key": st.session_state.get('openai_api_key', ''),
+                                "model_name": st.session_state.get('selected_model', '')
+                            }
+
+                            # Run context pre-processing
+                            analysis_results = self.input_processor.process_context(
+                                st.session_state['app_input'],
+                                model_config
+                            )
+
+                            # Store results
+                            st.session_state['analysis_results'] = analysis_results
+                            
+                            # Format enhanced context
+                            enhanced_context = self.input_processor.format_enhanced_context(analysis_results)
+                            st.session_state['enhanced_context'] = enhanced_context
+
+                            st.success("✅ Context pre-processing completed!")
+                            
+                        except Exception as e:
+                            logger.error(f"Pre-processing error: {str(e)}")
+                            st.error(f"❌ Error during pre-processing: {str(e)}")
+                else:
+                    st.warning("⚠️ Please provide application description before pre-processing")
+
         with col2:
-            # Application details
-            st.markdown("### Application Details")
+            # Application Configuration
+            st.markdown("### ⚙️ Application Configuration")
+            
+            # Application Type
             app_type = st.selectbox(
-                label="Select the application type",
+                "Application Type",
                 options=[
                     "Web application",
                     "Mobile application",
                     "Desktop application",
                     "Cloud application",
                     "IoT application",
-                    "Other",
+                    "Microservices",
+                    "Serverless",
+                    "Other"
                 ],
+                help="Select the type of application being analyzed"
             )
-            
-            # New Component Configuration Section
-            st.markdown("### Component Configuration")
-            
-            # Component Selection
+
+            # Component Configuration
+            st.markdown("#### 🔧 Components")
             components = st.multiselect(
                 "Select Components",
                 options=[
-                    "Azure Storage",
-                    "Application Insights",
-                    "Azure Cognitive Service",
-                    "API Gateway",
-                    "Load Balancer",
-                    "Web Frontend",
-                    "Backend Service",
+                    "Frontend",
+                    "Backend API",
                     "Database",
+                    "Authentication Service",
+                    "Load Balancer",
                     "Cache",
                     "Message Queue",
-                    "Authentication Service",
+                    "Storage Service",
+                    "CDN",
+                    "Search Service",
+                    "Analytics Service",
                     "Custom"
                 ],
-                help="Select the components used in your application"
+                help="Select all components used in your application"
             )
 
-            # If Custom is selected, allow custom component input
+            # Custom Component Input
             if "Custom" in components:
                 custom_component = st.text_input(
                     "Custom Component Name",
@@ -302,33 +348,11 @@ class AppUI:
                 if custom_component:
                     components = [c if c != "Custom" else custom_component for c in components]
 
-            if "detected_components" in st.session_state:
-                st.markdown("### 🔍 Detected Components")
-                for comp in st.session_state["detected_components"]:
-                    confidence_color = "#00ff00" if comp["confidence"] >= 0.6 else "#ffff00"
-                    st.markdown(
-                        f"""
-                        <div style='padding: 10px; border-left: 4px solid {confidence_color}; margin: 5px 0;'>
-                            <strong>{comp['name']}</strong> (Confidence: {comp['confidence']*100:.0f}%)
-                            <br/>Matches: {', '.join(comp['matches'])}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-                if "suggested_components" in st.session_state:
-                    st.markdown("### 💡 Suggested Additional Components")
-                    for suggestion in st.session_state["suggested_components"]:
-                        st.markdown(f"- {suggestion['type']}: {suggestion['reason']}")
-            
-
-            # Technology Stack Selection
+            # Technology Stack
+            st.markdown("#### 💻 Technology Stack")
             tech_stack = st.multiselect(
-                "Select Technology Stack",
+                "Select Technologies",
                 options=[
-                    "Azure Cloud",
-                    "AWS Cloud",
-                    "GCP Cloud",
                     "Node.js",
                     "Python",
                     "Java",
@@ -342,12 +366,15 @@ class AppUI:
                     "Kafka",
                     "Docker",
                     "Kubernetes",
+                    "AWS",
+                    "Azure",
+                    "GCP",
                     "Custom"
                 ],
-                help="Select the technologies used in your application"
+                help="Select all technologies used in your application"
             )
 
-            # If Custom is selected in tech stack
+            # Custom Technology Input
             if "Custom" in tech_stack:
                 custom_tech = st.text_input(
                     "Custom Technology",
@@ -355,40 +382,119 @@ class AppUI:
                 )
                 if custom_tech:
                     tech_stack = [t if t != "Custom" else custom_tech for t in tech_stack]
+
+            # Security Configuration
+            st.markdown("#### 🔒 Security Configuration")
             
-            # Existing fields...
-            sensitive_data = st.selectbox(
-                label="What is the highest sensitivity level of the data processed by the application?",
-                options=[
-                    "Top Secret",
-                    "Secret",
-                    "Confidential",
-                    "Restricted",
-                    "Unclassified",
-                    "None",
-                ],
+            # Data Sensitivity
+            sensitive_data = st.select_slider(
+                "Data Sensitivity Level",
+                options=["Public", "Internal", "Confidential", "Restricted", "Top Secret"],
+                value="Internal",
+                help="Select the highest sensitivity level of data processed"
             )
-            
-            internet_facing = st.selectbox(
-                label="Is the application internet-facing?",
-                options=["Yes", "No"],
+
+            # Internet Facing
+            internet_facing = st.radio(
+                "Internet Accessibility",
+                options=["Public (Internet Facing)", "Private (Internal Only)"],
+                help="Select whether the application is accessible from the internet"
             )
-            
+
+            # Authentication Methods
             authentication = st.multiselect(
-                "What authentication methods are supported by the application?",
-                ["SSO", "MFA", "OAUTH2", "Basic", "None","SSO","Access Token"],
+                "Authentication Methods",
+                options=[
+                    "Username/Password",
+                    "OAuth 2.0",
+                    "JWT",
+                    "SAML",
+                    "Multi-factor Authentication",
+                    "Biometric",
+                    "SSO",
+                    "None"
+                ],
+                help="Select all authentication methods used"
             )
-        
-        # Include component and tech stack in return value
+
+            # Display Analysis Results
+            if st.session_state.get('analysis_results'):
+                st.markdown("### 📊 Analysis Results")
+                
+                tabs = st.tabs(["Data Flows", "Trust Boundaries", "Tech Stack"])
+                
+                with tabs[0]:
+                    st.markdown("#### 🔄 Data Flows")
+                    flows = st.session_state['analysis_results']['analyses']['data_flows'].get('data_flows', [])
+                    for flow in flows:
+                        with st.expander(f"{flow['source']} → {flow['destination']}"):
+                            st.markdown(f"""
+                            - **Data Type:** {flow['data_type']}
+                            - **Sensitivity:** {flow['sensitivity']}
+                            - **Protocol:** {flow['protocol']}
+                            """)
+
+                with tabs[1]:
+                    st.markdown("#### 🛡️ Trust Boundaries")
+                    zones = st.session_state['analysis_results']['analyses']['trust_boundaries'].get('trust_zones', [])
+                    for zone in zones:
+                        with st.expander(f"{zone['name']} ({zone['type']})"):
+                            st.markdown(f"""
+                            - **Security Level:** {zone['security_level']}
+                            - **Components:** {', '.join(zone['components'])}
+                            """)
+
+                with tabs[2]:
+                    st.markdown("#### 🔧 Technology Stack")
+                    techs = st.session_state['analysis_results']['analyses']['tech_stack'].get('technologies', [])
+                    for tech in techs:
+                        with st.expander(f"{tech['name']} ({tech['category']})"):
+                            st.markdown(f"""
+                            - **Purpose:** {tech['purpose']}
+                            - **Security Implications:**
+                            """)
+                            for imp in tech['security_implications']:
+                                st.markdown(f"  - {imp}")
+
+                # Enhanced Context
+                st.markdown("### 📝 Enhanced Context")
+                enhanced_text = st.text_area(
+                    label="Review and edit enhanced context",
+                    value=st.session_state.get('enhanced_context', ''),
+                    height=200,
+                    key="enhanced_context",
+                    help="Review and modify the enhanced context before threat modeling"
+                )
+                
+                if enhanced_text != st.session_state.get('enhanced_context', ''):
+                    st.session_state['enhanced_context'] = enhanced_text
+
+                # Download Options
+                st.markdown("### 📥 Download Results")
+                col1, col2 = st.columns(2)
+                with col1:
+                    markdown_report = self.input_processor.get_markdown_report(
+                        st.session_state['analysis_results']
+                    )
+                    st.download_button(
+                        label="📄 Download Report",
+                        data=markdown_report,
+                        file_name="context_analysis_report.md",
+                        mime="text/markdown",
+                        help="Download complete analysis report"
+                    )
+
+        # Return the complete input configuration
         return {
-            "app_input": input_text,
+            "app_input": st.session_state.get('enhanced_context', input_text),
             "app_type": app_type,
+            "components": components,
+            "tech_stack": tech_stack,
             "sensitive_data": sensitive_data,
             "internet_facing": internet_facing,
             "authentication": authentication,
-            "components": components,
-            "tech_stack": tech_stack,
-            "use_agents": st.session_state.get('use_agents', False)
+            "use_agents": st.session_state.get('use_agents', False),
+            "analysis_results": st.session_state.get('analysis_results')
         }
 
     def _combine_content(self) -> str:

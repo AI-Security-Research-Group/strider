@@ -8,7 +8,18 @@ from ui.qa_context_ui import QAContextUI
 from ui.dfd_ui import DataFlowDiagramUI
 import logging
 
-logging.basicConfig(level=logging.INFO)
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+
+# Reduce noise from other libraries
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+logging.getLogger('openai').setLevel(logging.WARNING)
 
 def main():
     # Initialize UI, Service, and Database components
