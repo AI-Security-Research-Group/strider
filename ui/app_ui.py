@@ -427,34 +427,41 @@ class AppUI:
                     st.markdown("#### 🔄 Data Flows")
                     flows = st.session_state['analysis_results']['analyses']['data_flows'].get('data_flows', [])
                     for flow in flows:
-                        with st.expander(f"{flow['source']} → {flow['destination']}"):
+                        source = flow.get('source', 'Unknown')
+                        destination = flow.get('destination', 'Unknown')
+                        with st.expander(f"{source} → {destination}"):
                             st.markdown(f"""
-                            - **Data Type:** {flow['data_type']}
-                            - **Sensitivity:** {flow['sensitivity']}
-                            - **Protocol:** {flow['protocol']}
+                            - **Data Type:** {flow.get('data_type', 'Not specified')}
+                            - **Sensitivity:** {flow.get('sensitivity', 'Not specified')}
+                            - **Protocol:** {flow.get('protocol', 'Not specified')}
+                            - **Direction:** {flow.get('direction', 'Not specified')}
                             """)
 
-                with tabs[1]:
-                    st.markdown("#### 🛡️ Trust Boundaries")
-                    zones = st.session_state['analysis_results']['analyses']['trust_boundaries'].get('trust_zones', [])
-                    for zone in zones:
-                        with st.expander(f"{zone['name']} ({zone['type']})"):
-                            st.markdown(f"""
-                            - **Security Level:** {zone['security_level']}
-                            - **Components:** {', '.join(zone['components'])}
-                            """)
+                    with tabs[1]:
+                        st.markdown("#### 🛡️ Trust Boundaries")
+                        zones = st.session_state['analysis_results']['analyses']['trust_boundaries'].get('trust_zones', [])
+                        for zone in zones:
+                            with st.expander(f"{zone.get('name', 'Unknown Zone')} ({zone.get('type', 'Unknown Type')})"):
+                                st.markdown(f"""
+                                - **Security Level:** {zone.get('security_level', 'Not specified')}
+                                - **Components:** {', '.join(zone.get('components', ['None']))}
+                                """)
 
-                with tabs[2]:
-                    st.markdown("#### 🔧 Technology Stack")
-                    techs = st.session_state['analysis_results']['analyses']['tech_stack'].get('technologies', [])
-                    for tech in techs:
-                        with st.expander(f"{tech['name']} ({tech['category']})"):
-                            st.markdown(f"""
-                            - **Purpose:** {tech['purpose']}
-                            - **Security Implications:**
-                            """)
-                            for imp in tech['security_implications']:
-                                st.markdown(f"  - {imp}")
+                    with tabs[2]:
+                        st.markdown("#### 🔧 Technology Stack")
+                        techs = st.session_state['analysis_results']['analyses']['tech_stack'].get('technologies', [])
+                        for tech in techs:
+                            with st.expander(f"{tech.get('name', 'Unknown')} ({tech.get('category', 'Unknown Category')})"):
+                                st.markdown(f"""
+                                - **Purpose:** {tech.get('purpose', 'Not specified')}
+                                - **Security Implications:**
+                                """)
+                                implications = tech.get('security_implications', [])
+                                if implications:
+                                    for imp in implications:
+                                        st.markdown(f"  - {imp}")
+                                else:
+                                    st.markdown("  - No implications specified")
 
                 # Enhanced Context
                 if 'enhanced_context' not in st.session_state:

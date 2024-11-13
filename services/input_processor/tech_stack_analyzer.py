@@ -82,6 +82,8 @@ Focus on identifying:
 - Integration points
 - Development tools and practices
 
+Do not assume anything, write only fact which is given in description. If you are unable to find tech stack in description just return empty response in json in given format.
+
 Provide a structured analysis in the specified JSON format."""
 
     def _analyze_with_openai(self, prompt: str, model_config: Dict) -> Dict[str, Any]:
