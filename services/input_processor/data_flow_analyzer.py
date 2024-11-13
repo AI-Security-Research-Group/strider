@@ -59,10 +59,12 @@ class DataFlowAnalyzer:
             return self._get_empty_response()
 
     def _create_analysis_prompt(self, description: str) -> str:
-        return f"""Analyze the following application description and provide a data flow analysis in JSON format:
+        return f"""Analyze the following application description and provide a comprehensive data flow analysis in JSON format:
 
 Application Description:
 {description}
+
+Double check and make sure you are not missing any flow from given description
 
 Provide ONLY the JSON response, no additional text or formatting."""
 

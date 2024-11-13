@@ -457,16 +457,19 @@ class AppUI:
                                 st.markdown(f"  - {imp}")
 
                 # Enhanced Context
-                st.markdown("### 📝 Enhanced Context")
+                if 'enhanced_context' not in st.session_state:
+                    st.session_state['enhanced_context'] = ''
+
                 enhanced_text = st.text_area(
                     label="Review and edit enhanced context",
-                    value=st.session_state.get('enhanced_context', ''),
+                    value=st.session_state['enhanced_context'],  # Use direct session state value
                     height=200,
-                    key="enhanced_context",
+                    key="enhanced_context_area",  # Changed key to avoid conflict
                     help="Review and modify the enhanced context before threat modeling"
                 )
-                
-                if enhanced_text != st.session_state.get('enhanced_context', ''):
+
+                # Update session state when text changes
+                if enhanced_text != st.session_state['enhanced_context']:
                     st.session_state['enhanced_context'] = enhanced_text
 
                 # Download Options
@@ -653,7 +656,7 @@ class AppUI:
         """Process image analysis with proper state management"""
         if 'uploaded_image' not in st.session_state or st.session_state.uploaded_image != uploaded_image:
             st.session_state.uploaded_image = uploaded_image
-            with st.spinner("Analysing the uploaded image..."):
+            with st.spinner("🔎🔄"):
                 try:
                     model_name = st.session_state.get('selected_model')
                     image_data = uploaded_image.read()
