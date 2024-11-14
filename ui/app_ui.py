@@ -145,8 +145,11 @@ class AppUI:
         if model_provider == "Ollama":
             st.sidebar.markdown("""
             1. Ensure Ollama is running locally 🚀
-            2. For image analysis, ensure you have the Llava model installed
+            2. For image analysis, ensure you have the Llava model installed 💾
             3. Provide details of the application that you would like to threat model 📝
+            4. Run pre-context analysis and refine context details. 💬
+            5. Generate threat scenario for complete results. 📊
+
             """)
             
             try:
