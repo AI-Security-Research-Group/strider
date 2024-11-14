@@ -162,10 +162,10 @@ class InputContextProcessor:
         """Format the analysis results into a readable text format"""
         try:
             formatted_text = [
-                "Enhanced Application Context",
-                "=========================="
-                "",
-                "Original Description:",
+#                "Enhanced Application Context",
+#                "=========================="
+#                "",
+#                "Original Description:",
                 analysis_results["original_context"],
                 "",
                 "Data Flow Analysis:",
