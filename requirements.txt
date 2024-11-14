@@ -6,3 +6,13 @@ pandas
 datetime
 python-docx
 webvtt-py
+PyPDF2
+openai
+streamlit
+python-dotenv
+pandas
+datetime
+python-docx
+requests
+python-dateutil
+Pillow
