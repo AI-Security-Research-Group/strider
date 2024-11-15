@@ -36,11 +36,12 @@ You are a flow diagram expert who creates data flow diagrams using Mermaid synta
 
     return dfd_code
 
+# Ollama implementation
 def get_data_flow_diagram_ollama(ollama_model, prompt):
     url = "http://localhost:11434/api/chat"
 
     data = {
-        "model": "deepseek-coder-v2:latest",
+        "model": ollama_model,
         "stream": False,
         "messages": [
             {

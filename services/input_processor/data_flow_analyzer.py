@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class DataFlowAnalyzer:
     def __init__(self):
+        # Define the system prompt
         self.system_prompt = """You are a security-focused solution architect specializing in data flow analysis.
         Analyze the application description and provide your response in STRICT JSON format.
         Do not include any explanation or markdown formatting. Only output the JSON object.
@@ -43,6 +44,7 @@ class DataFlowAnalyzer:
             ]
         }"""
 
+    # Analyze data flows using specified LLM
     def analyze_flows(self, description: str, model_config: Dict) -> Dict[str, Any]:
         """Analyze data flows using specified LLM"""
         try:
