@@ -1,120 +1,176 @@
-# STRIDER
+<div align="center">
+  
+# STRIDER 
+### Adaptive STRIDE Threat Modeling System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/yourusername/strider/graphs/commit-activity)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-Adaptive STRIDE Threat Modeling System powered by AI for automated security analysis.
 
-## 🎯 Overview
+[Features](#features) • [Installation](#installation) • [Documentation](#documentation) • [Contributing](#contributing) • [Support](#support)
 
-STRIDER is a cutting-edge threat modeling assistant that leverages multiple Large Language Models (LLMs) to provide comprehensive security analysis using the STRIDE methodology. It helps engineering teams identify, analyze, and mitigate potential security threats in their applications.
+---
 
-## ✨ Key Features
+</div>
 
-- 🔍 Multi-model security analysis
-- 🌐 Support for local (Ollama) and cloud (OpenAI) LLMs
-- 🎯 STRIDE-based threat modeling
-- 📊 Data Flow Diagram generation
-- 🌳 Attack Tree visualization
-- 🎲 DREAD risk assessment
-- 📝 Test case generation
-- 💾 Integrated knowledge base
-- 📈 Progress tracking and visualization
-- 📋 Historical analysis storage
+## 🌟 Overview
+
+<table>
+<tr>
+<td>
+
+**STRIDER** revolutionizes threat modeling by combining cutting-edge AI with the proven STRIDE methodology. It empowers engineering teams to:
+
+- 🎯 Automate security analysis with multi-model AI
+- 🔍 Identify potential threats early in development
+- 📊 Visualize security landscapes through interactive diagrams
+- 🛠️ Generate actionable mitigation strategies
+
+</td>
+</tr>
+</table>
+
+## ⚡ Features
+
+<div align="center">
+
+| Core Features | Analysis Tools | Visualization | Integration |
+|--------------|----------------|---------------|-------------|
+| 🤖 Multi-Model AI | 📊 STRIDE Analysis | 🌳 Attack Trees | 🔌 Ollama Support |
+| 🧠 Knowledge Base | 🎲 DREAD Assessment | 📈 Data Flow Diagrams | ☁️ OpenAI Integration |
+| 🔄 Real-time Processing | ✅ Test Generation | 📱 Interactive UI | 💾 Local Database |
+| 🏗️ Component Detection | 🔍 Deep Inspection | 📉 Risk Visualization | 📡 API Support |
+
+</div>
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
+<details>
+<summary>Click to expand</summary>
+
+```markdown
 - Python 3.8+
-- Ollama (for local LLM support)
-- OpenAI API key (optional, for GPT models)
+- Ollama (for local models)
+- OpenAI API key (optional)
+- 8GB RAM minimum
+- 100GB disk space
+```
+</details>
 
-### Installation
+### 🔧 Installation
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/strider.git
-cd strider
+# Clone with depth 1
+git clone --depth 1 https://github.com/AI-Security-Research-Group/strider.git
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
+# Setup virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
 # or
-.\venv\Scripts\activate  # Windows
+.\.venv\Scripts\activate   # Windows
 
-# Install dependencies
-pip install -r requirements.txt
+# Install with progress
+pip install -r requirements.txt --progress-bar on
 ```
 
-### Running STRIDER
+### 🎮 Usage
 
-```bash
+```python
+# Start STRIDER
 streamlit run main.py
+
+# Access at http://localhost:8501
 ```
-
-## 💻 Usage
-
-1. **Select Model Provider**
-   - Choose between Ollama (local) or OpenAI API
-   - Configure model settings
-
-2. **Input Application Details**
-   - Describe your application
-   - Upload architecture diagrams
-   - Specify components and technology stack
-
-3. **Generate Analysis**
-   - Automated STRIDE threat analysis
-   - Interactive data flow diagrams
-   - Attack trees and DREAD assessment
-   - Security test cases
-
-4. **Review Results**
-   - View threat details and mitigations
-   - Export reports and diagrams
-   - Track historical analyses
 
 ## 🏗️ Architecture
 
-STRIDER follows a modular architecture:
-
-- 📁 `/services`: Core analysis modules
-  - Knowledge base integration
-  - Threat modeling engine
-  - Security agents
-  - Data processors
-
-- 📁 `/ui`: User interface components
-  - Main application UI
-  - Analysis dashboards
-  - Visualization tools
-
-- 📁 `/utils`: Utility functions
-  - File processing
-  - Database management
-  - Image analysis
-
-## 🔧 Configuration
-
-Configuration can be done through:
-- Environment variables
-- UI settings
-- `.env` file (for API keys)
+```mermaid
+graph TD
+    A[Frontend UI] --> B[Core Engine]
+    B --> C[Knowledge Base]
+    B --> D[AI Models]
+    B --> E[Analysis Tools]
+    E --> F[STRIDE]
+    E --> G[DREAD]
+    E --> H[Attack Trees]
+```
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit changes
-4. Push to the branch
-5. Open a Pull Request
+We welcome contributions! Here's how you can help:
 
-## 📄 License
+```mermaid
+graph LR
+    A[Fork] --> B[Branch]
+    B --> C[Change]
+    C --> D[Test]
+    D --> E[PR]
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+<table>
+<tr>
+<td>
+
+1. 🍴 Fork the repository
+2. 🌿 Create your feature branch
+3. 💻 Add your changes
+4. ✅ Ensure tests pass
+5. 📝 Update documentation
+6. 🚀 Submit PR
+
+</td>
+</tr>
+</table>
+
+## 📈 Project Status
+
+<div align="center">
+
+| Module | Status | Coverage |
+|--------|--------|----------|
+| Core Engine | ✅ Active | 40% |
+| UI Components | ✅ Active | 88% |
+| Documentation | 🚧 WIP | 75% |
+| Knowledge Base | ✅ Active | 12% |
+
+</div>
+
+
+## 🙏 Support
+
+<div align="center">
+
+| Type | Channel |
+|------|---------|
+| 🐛 Bugs | [Issue Tracker](https://github.com/AI-Security-Research-Group/strider/issues) |
+
+</div>
+
+## 📜 License
+
+<table>
+<tr>
+<td>
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+Copyright (c) 2024 STRIDER
+```
+
+</td>
+</tr>
+</table>
 
 ---
-Built with ❤️ 
+
+<div align="center">
+
+Made with ❤️ by the AISRG Team
