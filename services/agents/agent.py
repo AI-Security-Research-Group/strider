@@ -751,7 +751,7 @@ class SecurityAgent:
             logger.info(f"{'='*50}\n")
 
             payload = {
-                "model": "llama3.1:latest",
+                "model": "qwen2.5-coder:14b",
                 "messages": [
                     {
                         "role": "system",
@@ -765,7 +765,12 @@ class SecurityAgent:
                 "stream": False,
                 "options": {
                     "temperature": 0.7,
-                    "top_p": 0.9
+                    "top_p": 0.9,
+                    "frequency_penalty": 0.1,
+                    "presence_penalty": 0.1,
+                    "max_tokens": 4000,
+                    "timeout": 120,
+                    "request_timeout": 120
                 }
             }
             
