@@ -8,6 +8,7 @@ from services.input_processor.processor import InputContextProcessor
 import os
 from dotenv import load_dotenv
 import logging
+from streamlit_quill import st_quill
 
 logger = logging.getLogger(__name__)
 
@@ -420,82 +421,106 @@ class AppUI:
                 help="Select all authentication methods used"
             )
 
-            # Display Analysis Results
-            if st.session_state.get('analysis_results'):
-                st.markdown("### 📊 Analysis Results")
-                
-                tabs = st.tabs(["Data Flows", "Trust Boundaries", "Tech Stack"])
-                
-                with tabs[0]:
-                    st.markdown("#### 🔄 Data Flows")
-                    flows = st.session_state['analysis_results']['analyses']['data_flows'].get('data_flows', [])
-                    for flow in flows:
-                        source = flow.get('source', 'Unknown')
-                        destination = flow.get('destination', 'Unknown')
-                        with st.expander(f"{source} → {destination}"):
+        # End the columns section and start full-width content
+        if st.session_state.get('analysis_results'):
+            st.markdown("---")  # Add a separator for visual organization
+            
+            # Enhanced Context in full width
+            if 'enhanced_context' not in st.session_state:
+                st.session_state['enhanced_context'] = ''
+
+            st.markdown("### ✏️ Enhanced Context")
+            enhanced_text = st_quill(
+                value=st.session_state['enhanced_context'],
+                key="enhanced_context_area",
+                html=False,
+            )
+
+            # Update session state when text changes
+            if enhanced_text != st.session_state['enhanced_context']:
+                st.session_state['enhanced_context'] = enhanced_text
+
+            # Add a small space after the editor
+            st.markdown("")
+
+            # Create a placeholder for the Generate button from main.py
+            button_placeholder = st.empty()
+
+            # Return the inputs and button placeholder
+            ret_val = {
+                "app_input": st.session_state.get('enhanced_context', input_text),
+                "app_type": app_type,
+                "components": components,
+                "tech_stack": tech_stack,
+                "sensitive_data": sensitive_data,
+                "internet_facing": internet_facing,
+                "authentication": authentication,
+                "button_placeholder": button_placeholder
+            }
+
+            if not st.session_state.get('analysis_results'):
+                return ret_val
+
+            st.markdown("---")  # Add a separator
+            
+            # Analysis Results in full width
+            st.markdown("### 📊 Analysis Results")
+            tabs = st.tabs(["Data Flows", "Trust Boundaries", "Tech Stack"])
+            
+            with tabs[0]:
+                st.markdown("#### 🔄 Data Flows")
+                flows = st.session_state['analysis_results']['analyses']['data_flows'].get('data_flows', [])
+                for flow in flows:
+                    source = flow.get('source', 'Unknown')
+                    destination = flow.get('destination', 'Unknown')
+                    with st.expander(f"{source} → {destination}"):
+                        st.markdown(f"""
+                        - **Data Type:** {flow.get('data_type', 'Not specified')}
+                        - **Sensitivity:** {flow.get('sensitivity', 'Not specified')}
+                        - **Protocol:** {flow.get('protocol', 'Not specified')}
+                        - **Direction:** {flow.get('direction', 'Not specified')}
+                        """)
+
+                with tabs[1]:
+                    st.markdown("#### 🛡️ Trust Boundaries")
+                    zones = st.session_state['analysis_results']['analyses']['trust_boundaries'].get('trust_zones', [])
+                    for zone in zones:
+                        with st.expander(f"{zone.get('name', 'Unknown Zone')} ({zone.get('type', 'Unknown Type')})"):
                             st.markdown(f"""
-                            - **Data Type:** {flow.get('data_type', 'Not specified')}
-                            - **Sensitivity:** {flow.get('sensitivity', 'Not specified')}
-                            - **Protocol:** {flow.get('protocol', 'Not specified')}
-                            - **Direction:** {flow.get('direction', 'Not specified')}
+                            - **Security Level:** {zone.get('security_level', 'Not specified')}
+                            - **Components:** {', '.join(zone.get('components', ['None']))}
                             """)
 
-                    with tabs[1]:
-                        st.markdown("#### 🛡️ Trust Boundaries")
-                        zones = st.session_state['analysis_results']['analyses']['trust_boundaries'].get('trust_zones', [])
-                        for zone in zones:
-                            with st.expander(f"{zone.get('name', 'Unknown Zone')} ({zone.get('type', 'Unknown Type')})"):
-                                st.markdown(f"""
-                                - **Security Level:** {zone.get('security_level', 'Not specified')}
-                                - **Components:** {', '.join(zone.get('components', ['None']))}
-                                """)
+                with tabs[2]:
+                    st.markdown("#### 🔧 Technology Stack")
+                    techs = st.session_state['analysis_results']['analyses']['tech_stack'].get('technologies', [])
+                    for tech in techs:
+                        with st.expander(f"{tech.get('name', 'Unknown')} ({tech.get('category', 'Unknown Category')})"):
+                            st.markdown(f"""
+                            - **Purpose:** {tech.get('purpose', 'Not specified')}
+                            - **Security Implications:**
+                            """)
+                            implications = tech.get('security_implications', [])
+                            if implications:
+                                for imp in implications:
+                                    st.markdown(f"  - {imp}")
+                            else:
+                                st.markdown("  - No implications specified")
 
-                    with tabs[2]:
-                        st.markdown("#### 🔧 Technology Stack")
-                        techs = st.session_state['analysis_results']['analyses']['tech_stack'].get('technologies', [])
-                        for tech in techs:
-                            with st.expander(f"{tech.get('name', 'Unknown')} ({tech.get('category', 'Unknown Category')})"):
-                                st.markdown(f"""
-                                - **Purpose:** {tech.get('purpose', 'Not specified')}
-                                - **Security Implications:**
-                                """)
-                                implications = tech.get('security_implications', [])
-                                if implications:
-                                    for imp in implications:
-                                        st.markdown(f"  - {imp}")
-                                else:
-                                    st.markdown("  - No implications specified")
-
-                # Enhanced Context
-                if 'enhanced_context' not in st.session_state:
-                    st.session_state['enhanced_context'] = ''
-
-                enhanced_text = st.text_area(
-                    label="Review and edit enhanced context",
-                    value=st.session_state['enhanced_context'],  # Use direct session state value
-                    height=200,
-                    key="enhanced_context_area",  # Changed key to avoid conflict
-                    help="Review and modify the enhanced context before threat modeling"
+            # Download Options
+            st.markdown("### 📥 Download Results")
+            col1, col2 = st.columns(2)
+            with col1:
+                markdown_report = self.input_processor.get_markdown_report(
+                    st.session_state['analysis_results']
                 )
-
-                # Update session state when text changes
-                if enhanced_text != st.session_state['enhanced_context']:
-                    st.session_state['enhanced_context'] = enhanced_text
-
-                # Download Options
-                st.markdown("### 📥 Download Results")
-                col1, col2 = st.columns(2)
-                with col1:
-                    markdown_report = self.input_processor.get_markdown_report(
-                        st.session_state['analysis_results']
-                    )
-                    st.download_button(
-                        label="📄 Download Report",
-                        data=markdown_report,
-                        file_name="context_analysis_report.md",
-                        mime="text/markdown",
-                        help="Download complete analysis report"
-                    )
+                st.download_button(
+                    label="📄 Download Report",
+                    data=markdown_report,
+                    file_name="context_analysis_report.md",
+                    mime="text/markdown",
+                    help="Download complete analysis report"
+                )
 
         # Return the complete input configuration
         return {

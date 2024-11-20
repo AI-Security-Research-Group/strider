@@ -5,7 +5,7 @@ import logging
 
 def create_dfd_prompt(app_input):
     prompt = f"""
-Your task is to analyze the application details provided and create a comprehensive yet simple data flow diagram using Mermaid flowchart syntax.
+Your task is to analyze the application details provided and create a comprehensive yet simple data flow diagram using correct Mermaid flowchart syntax.
 
 Important: Double check and make sure syntaxt is supported by renderer.
 
@@ -47,14 +47,10 @@ def get_data_flow_diagram_ollama(ollama_model, prompt):
             {
                 "role": "system", 
                 "content": """
-You are a security expert who creates data flow diagrams using Mermaid syntax.
+You are a mermaid diagram expert who creates data flow diagrams using Mermaid syntax.
 Always use flowchart TD directive and ensure proper Mermaid syntax.
 Include all major components, data flows, and trust boundaries.
 Highlight sensitive data flows in red using appropriate syntax.
-Use subgraphs for trust boundaries and proper node shapes for different components:
-- External entities: rectangles [Entity]
-- Processes: rounded rectangles (Process)
-- Data stores: cylinder [(Store)]
 """
             },
             {
