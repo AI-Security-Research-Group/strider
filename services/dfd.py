@@ -5,13 +5,39 @@ import logging
 
 def create_dfd_prompt(app_input):
     prompt = f"""
-Your task is to analyze the application details provided and create a comprehensive yet simple data flow diagram using correct Mermaid flowchart syntax.
+You are an expert in creating data flow diagrams using Mermaid syntax. Your task is to analyze an application description and create a comprehensive yet simple data flow diagram based solely on the information provided.
 
-Important: Double check and make sure syntaxt is supported by renderer.
+Here is the application description you need to analyze:
 
-APPLICATION DESCRIPTION: {app_input}
+<app_description>
+{app_input}
+</app_description>
 
-You MUST only respond with the Mermaid code block.
+Please follow these steps to create an accurate and informative data flow diagram:
+
+1. Carefully analyze the application description provided above.
+2. Use the Mermaid flowchart syntax to create a data flow diagram.
+3. Include all major components, data flows, and trust boundaries mentioned in the description.
+4. Highlight sensitive data flows in red using appropriate Mermaid syntax.
+5. Ensure you're using the 'flowchart TD' directive for top-down flow.
+6. Double-check that all Mermaid syntax is correct and supported by standard renderers.
+
+It's OK for this section to be quite long.
+
+Example structure of a Mermaid flowchart (this is just a generic example, your actual diagram will be based on the specific application description):
+
+```mermaid
+flowchart TD
+    A[Component A] -->|Data Flow 1| B[Component B]
+    B -->|Data Flow 2| C[Component C]
+    C -->|Sensitive Data| D[Component D]
+    style C fill:#f9f,stroke:#333,stroke-width:4px
+    linkStyle 2 stroke:#ff3,stroke-width:4px;
+```
+
+Please provide only the Mermaid code block for the data flow diagram based on the given application description in response. no other data than Mermaid code block.
+
+
 """
     return prompt
 

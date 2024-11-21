@@ -559,7 +559,8 @@ class SecurityAgent:
                 "improvement_suggestions": (
                     llm_result.get("improvement_suggestions", []) +
                     self._get_kb_suggestions(kb_threats)
-                )
+                ),
+                "open_questions": llm_result.get("open_questions", [])
             }
 
             return merged_result
@@ -835,7 +836,9 @@ class SecurityAgent:
             validated = {
                 "threats": [],
                 "analysis_details": response.get("analysis_details", ""),
-                "confidence_level": response.get("confidence_level", "5")
+                "confidence_level": response.get("confidence_level", "5"),
+                "improvement_suggestions": response.get("improvement_suggestions", []),
+                "open_questions": response.get("open_questions", [])
             }
 
             # Check both 'threats' and 'threat_model' fields
@@ -845,12 +848,6 @@ class SecurityAgent:
                 logger.info(f"Found {len(threats)} threats to process")
                 validated["threats"] = threats
                 
-                # Add any improvement suggestions or open questions if present
-                if response.get("improvement_suggestions"):
-                    validated["improvement_suggestions"] = response["improvement_suggestions"]
-                if response.get("open_questions"):
-                    validated["open_questions"] = response["open_questions"]
-
             logger.info(f"Final validated response:\n{json.dumps(validated, indent=2)}")
             return validated
 
@@ -859,7 +856,9 @@ class SecurityAgent:
             return {
                 "threats": [],
                 "analysis_details": str(e),
-                "confidence_level": "0"
+                "confidence_level": "0",
+                "improvement_suggestions": [],
+                "open_questions": []
             }
 
     def _validate_stride_response(self, response: Dict[str, Any]) -> Dict[str, Any]:

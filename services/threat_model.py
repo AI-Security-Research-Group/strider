@@ -136,6 +136,13 @@ def json_to_markdown(threat_model: List[Dict[str, Any]],
 
         st.markdown("---")
 
+    # Display open questions if present
+    if open_questions:
+        st.markdown("## ❓ Open Questions")
+        for question in open_questions:
+            st.info(f"🤔 {question}")
+        st.markdown("---")
+
     # Main content in tabs (existing STRIDE analysis)
     tabs = st.tabs([name.replace('Expert', '').upper() for name in stride_results.keys()])
     
@@ -401,35 +408,15 @@ def get_image_analysis(api_key: str, model_name: str, prompt: str,
         logger.error(f"Error analyzing image: {str(e)}")
         return None
 
-def get_threat_model(api_key: str, model_name: str, prompt: str, use_agents: bool = False) -> Dict[str, Any]:
+def get_threat_model(api_key: str, model_name: str, prompt: str, use_agents: bool = True) -> Dict[str, Any]:
     """Get threat model using OpenAI"""
     try:
-        # If agent-based analysis is selected, only run that
-        if use_agents:
-            model_config = {
-                "provider": "OpenAI API",
-                "api_key": api_key,
-                "model_name": model_name
-            }
-            return analyze_with_agents(prompt, model_config)
-        
-        # Standard analysis
-        client = OpenAI(api_key=api_key)
-        response = client.chat.completions.create(
-            model=model_name,
-            response_format={"type": "json_object"},
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a security expert performing threat analysis."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
-        return json.loads(response.choices[0].message.content)
+        model_config = {
+            "provider": "OpenAI API",
+            "api_key": api_key,
+            "model_name": model_name
+        }
+        return analyze_with_agents(prompt, model_config)
     except Exception as e:
         st.error(f"Error in OpenAI analysis: {str(e)}")
         return {
@@ -438,33 +425,14 @@ def get_threat_model(api_key: str, model_name: str, prompt: str, use_agents: boo
             "open_questions": []
         }
 
-def get_threat_model_ollama(ollama_model: str, prompt: str, use_agents: bool = False) -> Dict[str, Any]:
+def get_threat_model_ollama(ollama_model: str, prompt: str, use_agents: bool = True) -> Dict[str, Any]:
     """Get threat model using Ollama"""
     try:
-        # If agent-based analysis is selected, only run that
-        if use_agents:
-            model_config = {
-                "provider": "Ollama",
-                "model_name": ollama_model
-            }
-            return analyze_with_agents(prompt, model_config)
-
-        # Standard analysis
-        url = "http://localhost:11434/api/generate"
-        data = {
-            "model": ollama_model,
-            "prompt": prompt,
-            "format": "json",
-            "stream": False
+        model_config = {
+            "provider": "Ollama",
+            "model_name": ollama_model
         }
-
-        response = requests.post(url, json=data)
-        outer_json = response.json()
-        
-        if isinstance(outer_json['response'], str):
-            return json.loads(outer_json['response'])
-        return outer_json['response']
-            
+        return analyze_with_agents(prompt, model_config)
     except Exception as e:
         st.error(f"Error in Ollama analysis: {str(e)}")
         return {
@@ -499,8 +467,9 @@ def combine_threat_analyses(analyses: List[Dict[str, Any]]) -> Dict[str, Any]:
         combined["improvement_suggestions"].update(analysis.get("improvement_suggestions", []))
         combined["open_questions"].update(analysis.get("open_questions", []))
     
-    # Convert sets back to lists
-    combined["improvement_suggestions"] = list(combined["improvement_suggestions"])
-    combined["open_questions"] = list(combined["open_questions"])
-    
-    return combined
+    # Convert sets back to lists for JSON serialization
+    return {
+        "threat_model": combined["threat_model"],
+        "improvement_suggestions": list(combined["improvement_suggestions"]),
+        "open_questions": list(combined["open_questions"])
+    }

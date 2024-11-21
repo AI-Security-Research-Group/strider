@@ -46,32 +46,34 @@ class AppUI:
     def _render_technology_stack(self, components: list[Dict[str, Any]]) -> None:
         """Render technology stack details"""
         for component in components:
-            with st.expander(f"🔹 {component['name']} ({component['type']})"):
-                # Technologies used
-                if component.get('technologies'):
-                    st.markdown("**Technologies:**")
-                    for tech in component['technologies']:
-                        st.markdown(f"- **{tech['name']}** ({tech['category']})")
-                        with st.expander("Security Implications"):
-                            for impl in tech.get('security_implications', []):
-                                st.markdown(f"- {impl}")
+            st.markdown(f"**{component['name']} ({component['type']})**")
+            # Technologies used
+            if component.get('technologies'):
+                st.markdown("**Technologies:**")
+                for tech in component['technologies']:
+                    st.markdown(f"- **{tech['name']}** ({tech['category']})")
+                    st.markdown(f"  - **Security Implications:**")
+                    for impl in tech.get('security_implications', []):
+                        st.markdown(f"    - {impl}")
+            st.markdown("---")
 
     def _render_integration_patterns(self, relationships: list[Dict[str, Any]]) -> None:
         """Render integration pattern details"""
         for rel in relationships:
             if rel.get('security_considerations'):
-                with st.expander(f"🔗 {rel.get('source', '')} → {rel.get('target', '')}"):
-                    # Display relationship details
-                    st.markdown(f"**Data Flow:** {rel.get('data_flow', 'N/A')}")
-                    if rel.get('requires_encryption'):
-                        st.warning("⚠️ Requires Encryption")
+                st.markdown(f"**{rel.get('source', '')} → {rel.get('target', '')}**")
+                # Display relationship details
+                st.markdown(f"**Data Flow:** {rel.get('data_flow', 'N/A')}")
+                if rel.get('requires_encryption'):
+                    st.warning("⚠️ Requires Encryption")
 
-                    # Security considerations
-                    st.markdown("**Security Considerations:**")
-                    for consid in rel['security_considerations']:
-                        st.markdown(f"- **{consid['pattern']}**")
-                        for risk in consid['risks']:
-                            st.markdown(f"  - {risk}")
+                # Security considerations
+                st.markdown("**Security Considerations:**")
+                for consid in rel['security_considerations']:
+                    st.markdown(f"- **{consid['pattern']}**")
+                    for risk in consid['risks']:
+                        st.markdown(f"  - {risk}")
+                st.markdown("---")
 
     def _render_security_summary(self, summary: Dict[str, Any]) -> None:
         """Render security summary"""
@@ -189,17 +191,8 @@ class AppUI:
 
         # Add analysis type selection here, after model selection
         st.sidebar.markdown("---")
-        st.sidebar.markdown("### Analysis Configuration")
-        analysis_type = st.sidebar.radio(
-            "Select Analysis Type",
-            ["Standard Analysis", "Agent-based Analysis"],
-            help="""
-            Choose the analysis method:
-            - Standard Analysis: Single-pass threat analysis
-            - Agent-based Analysis: Multiple specialized security experts analyze the system
-            """
-        )
-        st.session_state['use_agents'] = analysis_type == "Agent-based Analysis"
+        st.sidebar.markdown("🟢 Running in AI Agent Mode")
+        st.session_state['use_agents'] = True  # Always use agent-based analysis
             
         return model_provider, api_key, model_name
 
@@ -423,7 +416,7 @@ class AppUI:
 
         # End the columns section and start full-width content
         if st.session_state.get('analysis_results'):
-            st.markdown("---")  # Add a separator for visual organization
+            st.markdown("---")  # Add a separator
             
             # Enhanced Context in full width
             if 'enhanced_context' not in st.session_state:
@@ -464,48 +457,51 @@ class AppUI:
             st.markdown("---")  # Add a separator
             
             # Analysis Results in full width
-            st.markdown("### 📊 Analysis Results")
-            tabs = st.tabs(["Data Flows", "Trust Boundaries", "Tech Stack"])
-            
-            with tabs[0]:
-                st.markdown("#### 🔄 Data Flows")
-                flows = st.session_state['analysis_results']['analyses']['data_flows'].get('data_flows', [])
-                for flow in flows:
-                    source = flow.get('source', 'Unknown')
-                    destination = flow.get('destination', 'Unknown')
-                    with st.expander(f"{source} → {destination}"):
+            with st.expander("📊 Analysis Results", expanded=False):
+                tabs = st.tabs(["Data Flows", "Trust Boundaries", "Tech Stack"])
+                    
+                with tabs[0]:
+                    st.markdown("#### 🔄 Data Flows")
+                    flows = st.session_state['analysis_results']['analyses']['data_flows'].get('data_flows', [])
+                    for flow in flows:
+                        source = flow.get('source', 'Unknown')
+                        destination = flow.get('destination', 'Unknown')
+                        st.markdown(f"**{source} → {destination}**")
                         st.markdown(f"""
                         - **Data Type:** {flow.get('data_type', 'Not specified')}
                         - **Sensitivity:** {flow.get('sensitivity', 'Not specified')}
                         - **Protocol:** {flow.get('protocol', 'Not specified')}
                         - **Direction:** {flow.get('direction', 'Not specified')}
                         """)
+                        st.markdown("---")
 
                 with tabs[1]:
                     st.markdown("#### 🛡️ Trust Boundaries")
                     zones = st.session_state['analysis_results']['analyses']['trust_boundaries'].get('trust_zones', [])
                     for zone in zones:
-                        with st.expander(f"{zone.get('name', 'Unknown Zone')} ({zone.get('type', 'Unknown Type')})"):
-                            st.markdown(f"""
-                            - **Security Level:** {zone.get('security_level', 'Not specified')}
-                            - **Components:** {', '.join(zone.get('components', ['None']))}
-                            """)
+                        st.markdown(f"**{zone.get('name', 'Unknown Zone')} ({zone.get('type', 'Unknown Type')})**")
+                        st.markdown(f"""
+                        - **Security Level:** {zone.get('security_level', 'Not specified')}
+                        - **Components:** {', '.join(zone.get('components', ['None']))}
+                        """)
+                        st.markdown("---")
 
                 with tabs[2]:
                     st.markdown("#### 🔧 Technology Stack")
                     techs = st.session_state['analysis_results']['analyses']['tech_stack'].get('technologies', [])
                     for tech in techs:
-                        with st.expander(f"{tech.get('name', 'Unknown')} ({tech.get('category', 'Unknown Category')})"):
-                            st.markdown(f"""
-                            - **Purpose:** {tech.get('purpose', 'Not specified')}
-                            - **Security Implications:**
-                            """)
-                            implications = tech.get('security_implications', [])
-                            if implications:
-                                for imp in implications:
-                                    st.markdown(f"  - {imp}")
-                            else:
-                                st.markdown("  - No implications specified")
+                        st.markdown(f"**{tech.get('name', 'Unknown')} ({tech.get('category', 'Unknown Category')})**")
+                        st.markdown(f"""
+                        - **Purpose:** {tech.get('purpose', 'Not specified')}
+                        - **Security Implications:**
+                        """)
+                        implications = tech.get('security_implications', [])
+                        if implications:
+                            for imp in implications:
+                                st.markdown(f"  - {imp}")
+                        else:
+                            st.markdown("  - No implications specified")
+                        st.markdown("---")
 
             # Download Options
             st.markdown("### 📥 Download Results")

@@ -54,22 +54,30 @@ Your analysis must consider:
 
 Provide analysis strictly in this JSON format only as given below, no other format allowed:
 {
-    "threats": [
+    "threat_model": [
         {
-            "Threat Type": "Spoofing",
+            "Threat Type": "<STRIDE category>",
             "component_name": "<affected component>",
             "component_type": "<component type>",
             "technology": "<specific technology if applicable>",
             "Scenario": "<detailed attack scenario>",
+            "Potential Impact": "<impact description>",
             "attack_vectors": ["vector1", "vector2"],
             "affected_components": ["component1", "component2"],
-            "Potential Impact": "<impact description>",
             "risk_score": "<1-10>"
         }
     ],
+    "improvement_suggestions": [
+        "<specific suggestions for security improvements>"
+    ],
+    "open_questions": [
+        "<critical questions that need answers>"
+    ],
     "analysis_details": "<comprehensive analysis>",
     "confidence_level": "<1-10 rating with explanation>"
-}"""
+}
+
+"""
     ),
     (
         "TamperingExpert",
@@ -97,22 +105,30 @@ Focus Areas:
 
 Provide analysis strictly in this JSON format only as given below, no other format allowed:
 {
-    "threats": [
+    "threat_model": [
         {
-            "Threat Type": "Tampering",
+            "Threat Type": "<STRIDE category>",
             "component_name": "<affected component>",
             "component_type": "<component type>",
             "technology": "<specific technology if applicable>",
             "Scenario": "<detailed attack scenario>",
+            "Potential Impact": "<impact description>",
             "attack_vectors": ["vector1", "vector2"],
             "affected_components": ["component1", "component2"],
-            "Potential Impact": "<impact description>",
             "risk_score": "<1-10>"
         }
     ],
+    "improvement_suggestions": [
+        "<specific suggestions for security improvements>"
+    ],
+    "open_questions": [
+        "<critical questions that need answers>"
+    ],
     "analysis_details": "<comprehensive analysis>",
     "confidence_level": "<1-10 rating with explanation>"
-}"""
+}
+
+"""
     ),
     (
         "RepudiationExpert",
@@ -140,22 +156,30 @@ Focus Areas:
 
 Provide analysis strictly in this JSON format only as given below, no other format allowed:
 {
-    "threats": [
+    "threat_model": [
         {
-            "Threat Type": "Repudiation",
+            "Threat Type": "<STRIDE category>",
             "component_name": "<affected component>",
             "component_type": "<component type>",
             "technology": "<specific technology if applicable>",
             "Scenario": "<detailed attack scenario>",
+            "Potential Impact": "<impact description>",
             "attack_vectors": ["vector1", "vector2"],
             "affected_components": ["component1", "component2"],
-            "Potential Impact": "<impact description>",
             "risk_score": "<1-10>"
         }
     ],
+    "improvement_suggestions": [
+        "<specific suggestions for security improvements>"
+    ],
+    "open_questions": [
+        "<critical questions that need answers>"
+    ],
     "analysis_details": "<comprehensive analysis>",
     "confidence_level": "<1-10 rating with explanation>"
-}"""
+}
+
+"""
     ),
 
     (
@@ -193,9 +217,9 @@ Your analysis must consider:
 
 Provide analysis strictly in this JSON format only as given below, no other format allowed:
 {
-    "threats": [
+    "threat_model": [
         {
-            "Threat Type": "Information Disclosure",
+            "Threat Type": "<STRIDE category>",
             "component_name": "<affected component>",
             "component_type": "<component type>",
             "technology": "<specific technology if applicable>",
@@ -207,14 +231,16 @@ Provide analysis strictly in this JSON format only as given below, no other form
         }
     ],
     "improvement_suggestions": [
-        "<specific suggestions for preventing data leakage>"
+        "<specific suggestions for security improvements>"
     ],
     "open_questions": [
-        "<critical questions about data protection>"
+        "<critical questions that need answers>"
     ],
-    "analysis_details": "<comprehensive analysis of data exposure risks>",
+    "analysis_details": "<comprehensive analysis>",
     "confidence_level": "<1-10 rating with explanation>"
-}"""
+}
+
+"""
     ),
 
     (
@@ -243,22 +269,30 @@ Focus Areas:
 
 Provide analysis strictly in this JSON format only as given below, no other format allowed:
 {
-    "threats": [
+    "threat_model": [
         {
-            "Threat Type": "Denial of Service",
+            "Threat Type": "<STRIDE category>",
             "component_name": "<affected component>",
             "component_type": "<component type>",
             "technology": "<specific technology if applicable>",
             "Scenario": "<detailed attack scenario>",
+            "Potential Impact": "<impact description>",
             "attack_vectors": ["vector1", "vector2"],
             "affected_components": ["component1", "component2"],
-            "Potential Impact": "<impact description>",
             "risk_score": "<1-10>"
         }
     ],
+    "improvement_suggestions": [
+        "<specific suggestions for security improvements>"
+    ],
+    "open_questions": [
+        "<critical questions that need answers>"
+    ],
     "analysis_details": "<comprehensive analysis>",
     "confidence_level": "<1-10 rating with explanation>"
-}"""
+}
+
+"""
     ),
     (
         "ElevationExpert",
@@ -286,22 +320,30 @@ Focus Areas:
 
 Provide analysis strictly in this JSON format only as given below, no other format allowed:
 {
-    "threats": [
+    "threat_model": [
         {
-            "Threat Type": "Elevation of Privilege",
+            "Threat Type": "<STRIDE category>",
             "component_name": "<affected component>",
             "component_type": "<component type>",
             "technology": "<specific technology if applicable>",
             "Scenario": "<detailed attack scenario>",
+            "Potential Impact": "<impact description>",
             "attack_vectors": ["vector1", "vector2"],
             "affected_components": ["component1", "component2"],
-            "Potential Impact": "<impact description>",
             "risk_score": "<1-10>"
         }
     ],
+    "improvement_suggestions": [
+        "<specific suggestions for security improvements>"
+    ],
+    "open_questions": [
+        "<critical questions that need answers>"
+    ],
     "analysis_details": "<comprehensive analysis>",
     "confidence_level": "<1-10 rating with explanation>"
-}"""
+}
+
+"""
     ),
     (
         "ThreatModelCompiler",
