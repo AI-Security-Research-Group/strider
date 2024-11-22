@@ -11,7 +11,6 @@ class TranscriptUI:
     def render(self, model_config: dict) -> None:
         """Render the transcript analysis UI section"""
         st.markdown("""
-        ## Transcript Analysis
         Upload or paste walkthrough meeting transcripts for automated analysis.
         The system will extract relevant application details to enhance the threat model context.
         """)

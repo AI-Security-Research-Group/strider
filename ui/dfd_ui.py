@@ -24,8 +24,6 @@ class DataFlowDiagramUI:
     def render():
         """Render the Data Flow Diagram tab content"""
         st.markdown("""
-        ## Data Flow Diagram Generator
-        
         Data Flow Diagrams (DFDs) help visualize how data moves through an application or system. 
         Using the context provided in the application description, this will generate a Data flow diagram.
         """)

@@ -33,6 +33,8 @@ AGENT_PROMPTS = [
         "SpoofingExpert",
         """You are an AI agent called "Spoofing Expert" specializing in identifying authentication and identity-related threats. Focus on analyzing both component-specific and system-wide spoofing threats.
 
+        Always explain the Scenario by referencing the context mentioned in the system description.
+
 Component Analysis Instructions:
 1. For each component identified:
    - Evaluate authentication mechanisms
@@ -81,7 +83,7 @@ Provide analysis strictly in this JSON format only as given below, no other form
     ),
     (
         "TamperingExpert",
-        """You are a Tampering Security Expert analyzing data and system integrity threats across components.
+        """You are a Tampering Security Expert analyzing data and system integrity threats across system and components.
 
 Component Analysis Instructions:
 1. For each component:
@@ -132,7 +134,7 @@ Provide analysis strictly in this JSON format only as given below, no other form
     ),
     (
         "RepudiationExpert",
-        """You are a Repudiation Security Expert analyzing logging and accountability across components.
+        """You are a Repudiation Security Expert analyzing logging and accountability across system and components.
 
 Component Analysis Instructions:
 1. For each component:
@@ -245,7 +247,7 @@ Provide analysis strictly in this JSON format only as given below, no other form
 
     (
         "DosExpert",
-        """You are a Denial of Service Expert analyzing availability risks across components.
+        """You are a Denial of Service Expert analyzing availability risks across system and components.
 
 Component Analysis Instructions:
 1. For each component:
@@ -296,7 +298,7 @@ Provide analysis strictly in this JSON format only as given below, no other form
     ),
     (
         "ElevationExpert",
-        """You are an Elevation of Privilege Expert analyzing authorization across components.
+        """You are an Elevation of Privilege Expert analyzing authorization across system and components.
 
 Component Analysis Instructions:
 1. For each component:

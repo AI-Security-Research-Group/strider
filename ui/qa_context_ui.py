@@ -18,7 +18,6 @@ class QAContextUI:
 
     def render(self, inputs: Dict[str, Any], model_config: Dict[str, str]) -> None:
         st.markdown("""
-        ## Q&A Context Builder
         Use this section to gather additional security context through guided questions.
         The AI agent will analyze your input and generate relevant questions to help build a more comprehensive threat model.
         """)
