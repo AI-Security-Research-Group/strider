@@ -16,3 +16,4 @@ python-docx
 requests
 python-dateutil
 Pillow
+pytesseract
